@@ -1,0 +1,217 @@
+---
+export interface Props {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  priority?: boolean;
+  className?: string;
+  caption?: string;
+  aspectRatio?: string;
+}
+
+const { 
+  src, 
+  alt, 
+  width, 
+  height, 
+  sizes = '100vw',
+  loading = 'lazy',
+  priority = false,
+  className = '',
+  caption,
+  aspectRatio
+} = Astro.props;
+
+// Generate responsive image URLs
+const generateImageUrls = (imageSrc: string) => {
+  const baseUrl = new URL(imageSrc, Astro.url);
+  const params = new URLSearchParams(baseUrl.search);
+  
+  // WebP format with quality optimization
+  const webpUrl = `${baseUrl.pathname}?format=webp&q=85&w=${width || 800}`;
+  const webpUrl2x = `${baseUrl.pathname}?format=webp&q=85&w=${(width || 800) * 2}`;
+  
+  // Fallback formats
+  const jpgUrl = `${baseUrl.pathname}?format=jpg&q=85&w=${width || 800}`;
+  const jpgUrl2x = `${baseUrl.pathname}?format=jpg&q=85&w=${(width || 800) * 2}`;
+  
+  return {
+    webp: webpUrl,
+    webp2x: webpUrl2x,
+    jpg: jpgUrl,
+    jpg2x: jpgUrl2x
+  };
+};
+
+const imageUrls = generateImageUrls(src);
+---
+
+<div class={`optimized-image-container ${className}`}>
+  <picture class="block">
+    <!-- WebP format (modern browsers) -->
+    <source
+      type="image/webp"
+      srcset={`${imageUrls.webp} 1x, ${imageUrls.webp2x} 2x`}
+      sizes={sizes}
+    />
+    
+    <!-- JPEG fallback -->
+    <source
+      type="image/jpeg"
+      srcset={`${imageUrls.jpg} 1x, ${imageUrls.jpg2x} 2x`}
+      sizes={sizes}
+    />
+    
+    <!-- Fallback img element -->
+    <img
+      src={imageUrls.jpg}
+      alt={alt}
+      width={width}
+      height={height}
+      loading={priority ? 'eager' : loading}
+      decoding="async"
+      class={`w-full h-auto object-cover ${aspectRatio ? `aspect-${aspectRatio}` : ''}`}
+      style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''}
+    />
+  </picture>
+  
+  {caption && (
+    <figcaption class="text-sm text-gray-600 dark:text-gray-400 mt-2 text-center">
+      {caption}
+    </figcaption>
+  )}
+</div>
+
+<script>
+  class ImageOptimizer {
+    constructor() {
+      this.images = document.querySelectorAll('img[loading="lazy"]');
+      this.init();
+    }
+    
+    init() {
+      if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              this.loadImage(entry.target);
+              imageObserver.unobserve(entry.target);
+            }
+          });
+        }, {
+          rootMargin: '50px 0px',
+          threshold: 0.01
+        });
+        
+        this.images.forEach(img => {
+          imageObserver.observe(img);
+        });
+      } else {
+        // Fallback for older browsers
+        this.loadAllImages();
+      }
+    }
+    
+    loadImage(img) {
+      // Add loading animation
+      img.classList.add('loading');
+      
+      // Create a new image to preload
+      const tempImg = new Image();
+      tempImg.onload = () => {
+        img.src = tempImg.src;
+        img.classList.remove('loading');
+        img.classList.add('loaded');
+      };
+      tempImg.onerror = () => {
+        img.classList.remove('loading');
+        img.classList.add('error');
+      };
+      tempImg.src = img.src;
+    }
+    
+    loadAllImages() {
+      this.images.forEach(img => {
+        this.loadImage(img);
+      });
+    }
+  }
+  
+  // Initialize image optimization
+  document.addEventListener('DOMContentLoaded', () => {
+    new ImageOptimizer();
+  });
+</script>
+
+<style>
+  .optimized-image-container {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .optimized-image-container img {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  .optimized-image-container img.loading {
+    opacity: 0.5;
+    transform: scale(1.02);
+  }
+  
+  .optimized-image-container img.loaded {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  .optimized-image-container img.error {
+    opacity: 0.3;
+  }
+  
+  /* Responsive aspect ratios */
+  .aspect-16-9 {
+    aspect-ratio: 16/9;
+  }
+  
+  .aspect-4-3 {
+    aspect-ratio: 4/3;
+  }
+  
+  .aspect-1-1 {
+    aspect-ratio: 1/1;
+  }
+  
+  .aspect-3-2 {
+    aspect-ratio: 3/2;
+  }
+  
+  /* Loading skeleton */
+  .optimized-image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    z-index: -1;
+  }
+  
+  .optimized-image-container img.loaded + .optimized-image-container::before {
+    display: none;
+  }
+  
+  @keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  
+  /* Dark mode adjustments */
+  .dark .optimized-image-container::before {
+    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  }
+</style> 

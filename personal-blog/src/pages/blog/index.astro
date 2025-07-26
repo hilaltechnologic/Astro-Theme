@@ -1,0 +1,192 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all blog posts
+const posts = await getCollection('blog');
+const sortedPosts = posts.sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime());
+
+// Pagination
+const postsPerPage = 9;
+const currentPage = Astro.url.searchParams.get('page') ? parseInt(Astro.url.searchParams.get('page')) : 1;
+const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
+const startIndex = (currentPage - 1) * postsPerPage;
+const endIndex = startIndex + postsPerPage;
+const currentPosts = sortedPosts.slice(startIndex, endIndex);
+
+// Get unique tags
+const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
+const selectedTag = Astro.url.searchParams.get('tag');
+const filteredPosts = selectedTag 
+  ? sortedPosts.filter(post => post.data.tags?.includes(selectedTag))
+  : sortedPosts;
+---
+
+<BaseLayout title="Blog" description="All blog posts and articles">
+  <div class="bg-white dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          Blog
+        </h1>
+        <p class="text-xl text-gray-600 dark:text-gray-300">
+          Thoughts, tutorials, and insights
+        </p>
+      </div>
+
+      <!-- Tag Filter -->
+      {allTags.length > 0 && (
+        <div class="mb-8">
+          <div class="flex flex-wrap gap-2 justify-center">
+            <a 
+              href="/blog" 
+              class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                !selectedTag 
+                  ? 'bg-primary-600 text-white' 
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              All
+            </a>
+            {allTags.map(tag => (
+              <a 
+                href={`/blog?tag=${encodeURIComponent(tag)}`}
+                class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedTag === tag 
+                    ? 'bg-primary-600 text-white' 
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Posts Grid -->
+      {currentPosts.length > 0 ? (
+        <>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {currentPosts.map((post) => (
+              <article class="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                {post.data.image && (
+                  <img 
+                    src={post.data.image} 
+                    alt={post.data.title}
+                    class="w-full h-48 object-cover"
+                  />
+                )}
+                <div class="p-6">
+                  <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    <time datetime={post.data.pubDate.toISOString()}>
+                      {post.data.pubDate.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </time>
+                    {post.data.tags && post.data.tags.length > 0 && (
+                      <span class="ml-4">
+                        {post.data.tags[0]}
+                      </span>
+                    )}
+                  </div>
+                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                    <a href={`/blog/${post.slug}`} class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                      {post.data.title}
+                    </a>
+                  </h2>
+                  <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                    {post.data.description}
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <a 
+                      href={`/blog/${post.slug}`}
+                      class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold transition-colors"
+                    >
+                      Read more →
+                    </a>
+                    {post.data.readingTime && (
+                      <span class="text-sm text-gray-500 dark:text-gray-400">
+                        {post.data.readingTime} min read
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <!-- Pagination -->
+          {totalPages > 1 && (
+            <div class="flex justify-center">
+              <nav class="flex items-center space-x-2">
+                {currentPage > 1 && (
+                  <a 
+                    href={`/blog?page=${currentPage - 1}${selectedTag ? `&tag=${encodeURIComponent(selectedTag)}` : ''}`}
+                    class="px-3 py-2 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  >
+                    ← Previous
+                  </a>
+                )}
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <a 
+                    href={`/blog?page=${page}${selectedTag ? `&tag=${encodeURIComponent(selectedTag)}` : ''}`}
+                    class={`px-3 py-2 rounded-md transition-colors ${
+                      page === currentPage
+                        ? 'bg-primary-600 text-white'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400'
+                    }`}
+                  >
+                    {page}
+                  </a>
+                ))}
+                
+                {currentPage < totalPages && (
+                  <a 
+                    href={`/blog?page=${currentPage + 1}${selectedTag ? `&tag=${encodeURIComponent(selectedTag)}` : ''}`}
+                    class="px-3 py-2 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  >
+                    Next →
+                  </a>
+                )}
+              </nav>
+            </div>
+          )}
+        </>
+      ) : (
+        <div class="text-center py-12">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            No posts found
+          </h3>
+          <p class="text-gray-600 dark:text-gray-300">
+            {selectedTag 
+              ? `No posts found with tag "${selectedTag}"`
+              : 'No blog posts available yet.'
+            }
+          </p>
+          {selectedTag && (
+            <a 
+              href="/blog" 
+              class="inline-block mt-4 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold"
+            >
+              View all posts
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style> 

@@ -1,0 +1,56 @@
+{
+  "name": "astro-personal-blog-theme",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "The most comprehensive Astro blog theme with 58 features - SEO, Performance, Accessibility, and more",
+  "author": "Your Name",
+  "license": "MIT",
+  "keywords": [
+    "astro",
+    "blog",
+    "theme",
+    "seo",
+    "performance",
+    "accessibility",
+    "responsive",
+    "dark-mode",
+    "mdx",
+    "tailwind"
+  ],
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "build:production": "astro build",
+    "deploy:cloudflare": "npm run build && wrangler pages publish dist",
+    "deploy:netlify": "npm run build && netlify deploy --prod --dir=dist",
+    "deploy:vercel": "npm run build && vercel --prod",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "echo \"No linting specified\" && exit 0"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^2.0.0",
+    "@astrojs/rss": "^4.0.0",
+    "@astrojs/sitemap": "^3.0.0",
+    "@astrojs/tailwind": "^5.0.0",
+    "astro": "^4.0.0",
+    "tailwindcss": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/astro-blog-theme.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/astro-blog-theme/issues"
+  },
+  "homepage": "https://astro-blog-theme-demo.pages.dev"
+}

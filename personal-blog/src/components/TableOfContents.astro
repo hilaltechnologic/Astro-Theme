@@ -1,0 +1,175 @@
+---
+// Table of Contents component
+---
+
+<div id="toc-container" class="hidden lg:block">
+  <div class="sticky top-8">
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        Table of Contents
+      </h3>
+      <nav id="toc-nav" class="space-y-2">
+        <!-- TOC items will be generated here -->
+      </nav>
+    </div>
+  </div>
+</div>
+
+<script>
+  class TableOfContents {
+    constructor() {
+      this.tocContainer = document.getElementById('toc-container');
+      this.tocNav = document.getElementById('toc-nav');
+      this.article = document.querySelector('article') || document.querySelector('main');
+      
+      if (!this.tocContainer || !this.tocNav || !this.article) return;
+      
+      this.headings = [];
+      this.tocItems = [];
+      
+      this.init();
+    }
+    
+    init() {
+      this.extractHeadings();
+      this.generateTOC();
+      this.setupScrollSpy();
+    }
+    
+    extractHeadings() {
+      // Get all headings (h2, h3, h4) from the article
+      const headingElements = this.article.querySelectorAll('h2, h3, h4');
+      
+      this.headings = Array.from(headingElements).map((heading, index) => {
+        // Generate ID if not present
+        if (!heading.id) {
+          heading.id = `heading-${index}`;
+        }
+        
+        return {
+          element: heading,
+          id: heading.id,
+          text: heading.textContent,
+          level: parseInt(heading.tagName.charAt(1)),
+          top: heading.offsetTop
+        };
+      });
+    }
+    
+    generateTOC() {
+      if (this.headings.length === 0) {
+        this.tocContainer.style.display = 'none';
+        return;
+      }
+      
+      this.tocNav.innerHTML = this.headings.map(heading => {
+        const indent = (heading.level - 2) * 16; // Indent based on heading level
+        const activeClass = heading === this.headings[0] ? 'text-primary-600 dark:text-primary-400 font-medium' : 'text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400';
+        
+        return `
+          <a 
+            href="#${heading.id}" 
+            class="block text-sm transition-colors ${activeClass}"
+            style="padding-left: ${indent}px"
+            data-heading-id="${heading.id}"
+          >
+            ${heading.text}
+          </a>
+        `;
+      }).join('');
+      
+      // Add click handlers for smooth scrolling
+      this.tocNav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('href').substring(1);
+          const targetElement = document.getElementById(targetId);
+          
+          if (targetElement) {
+            const headerHeight = 80; // Adjust based on your header height
+            const targetPosition = targetElement.offsetTop - headerHeight;
+            
+            window.scrollTo({
+              top: targetPosition,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+    }
+    
+    setupScrollSpy() {
+      let ticking = false;
+      
+      const updateActiveHeading = () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            this.updateActiveHeading();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      };
+      
+      window.addEventListener('scroll', updateActiveHeading, { passive: true });
+      
+      // Initial update
+      this.updateActiveHeading();
+    }
+    
+    updateActiveHeading() {
+      const scrollPosition = window.pageYOffset + 100; // Offset for header
+      
+      let activeHeading = null;
+      
+      // Find the current active heading
+      for (let i = this.headings.length - 1; i >= 0; i--) {
+        const heading = this.headings[i];
+        if (scrollPosition >= heading.top) {
+          activeHeading = heading;
+          break;
+        }
+      }
+      
+      // Update TOC active state
+      this.tocNav.querySelectorAll('a').forEach(link => {
+        const headingId = link.getAttribute('data-heading-id');
+        const isActive = activeHeading && headingId === activeHeading.id;
+        
+        if (isActive) {
+          link.classList.add('text-primary-600', 'dark:text-primary-400', 'font-medium');
+          link.classList.remove('text-gray-600', 'dark:text-gray-300', 'hover:text-primary-600', 'dark:hover:text-primary-400');
+        } else {
+          link.classList.remove('text-primary-600', 'dark:text-primary-400', 'font-medium');
+          link.classList.add('text-gray-600', 'dark:text-gray-300', 'hover:text-primary-600', 'dark:hover:text-primary-400');
+        }
+      });
+    }
+  }
+  
+  // Initialize TOC when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    new TableOfContents();
+  });
+</script>
+
+<style>
+  #toc-container {
+    position: sticky;
+    top: 2rem;
+  }
+  
+  #toc-nav a {
+    border-left: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  #toc-nav a:hover {
+    border-left-color: #0ea5e9;
+  }
+  
+  #toc-nav a.text-primary-600,
+  #toc-nav a.dark\:text-primary-400 {
+    border-left-color: #0ea5e9;
+  }
+</style> 

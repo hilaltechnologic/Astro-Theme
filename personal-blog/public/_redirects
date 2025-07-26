@@ -1,0 +1,8 @@
+# Netlify redirects
+/demo /demo/ 301
+/showcase /showcase/ 301
+/comparison /comparison/ 301
+/layouts /layouts/ 301
+
+# SPA fallback
+/* /index.html 200 

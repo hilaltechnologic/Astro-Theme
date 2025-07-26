@@ -1,0 +1,241 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Get blog posts for featured section
+const posts = await getCollection('blog');
+const featuredPosts = posts
+  .filter(post => post.data.featured)
+  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
+  .slice(0, 3);
+
+const recentPosts = posts
+  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
+  .slice(0, 6);
+---
+
+<BaseLayout title="Welcome to My Personal Blog">
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-900 dark:to-gray-800 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          Welcome to My
+          <span class="text-primary-600 dark:text-primary-400">Personal Blog</span>
+        </h1>
+        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+          Sharing thoughts on technology, life, and everything in between. 
+          Join me on this journey of discovery and learning.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/blog" class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            Read Blog
+          </a>
+                      <a href="/demo" class="bg-primary-600 text-white hover:bg-primary-700 px-8 py-3 rounded-lg font-semibold transition-colors">
+              View Complete Demo
+            </a>
+            <a href="/showcase" class="bg-green-600 text-white hover:bg-green-700 px-8 py-3 rounded-lg font-semibold transition-colors">
+              Feature Showcase
+            </a>
+            <a href="/comparison" class="bg-purple-600 text-white hover:bg-purple-700 px-8 py-3 rounded-lg font-semibold transition-colors">
+              Theme Comparison
+            </a>
+            <a href="/layouts" class="border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+              View Layouts
+            </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Posts -->
+  {featuredPosts.length > 0 && (
+    <section class="py-16 bg-white dark:bg-gray-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            Featured Posts
+          </h2>
+          <p class="text-gray-600 dark:text-gray-300">
+            My most popular and important articles
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {featuredPosts.map((post) => (
+            <article class="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              {post.data.image && (
+                <img 
+                  src={post.data.image} 
+                  alt={post.data.title}
+                  class="w-full h-48 object-cover"
+                />
+              )}
+              <div class="p-6">
+                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  <time datetime={post.data.pubDate.toISOString()}>
+                    {post.data.pubDate.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </time>
+                  {post.data.tags && (
+                    <span class="ml-4">
+                      {post.data.tags[0]}
+                    </span>
+                  )}
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                  <a href={`/blog/${post.slug}`} class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                    {post.data.title}
+                  </a>
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                  {post.data.description}
+                </p>
+                <a 
+                  href={`/blog/${post.slug}`}
+                  class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold transition-colors"
+                >
+                  Read more →
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- About Section -->
+  <section class="py-16 bg-gray-50 dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+            About Me
+          </h2>
+          <p class="text-lg text-gray-600 dark:text-gray-300 mb-6">
+            Hi! I'm a passionate writer and technology enthusiast who loves sharing knowledge 
+            and experiences through writing. This blog is my digital space where I explore 
+            various topics that interest me and hopefully you too.
+          </p>
+          <p class="text-gray-600 dark:text-gray-300 mb-8">
+            From technical tutorials to personal reflections, I aim to create content that 
+            is both informative and engaging. Whether you're here to learn something new 
+            or just curious about my thoughts, I'm glad you stopped by.
+          </p>
+          <a 
+            href="/about" 
+            class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold transition-colors"
+          >
+            Learn more about me
+            <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+        <div class="relative">
+          <div class="bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg p-8 text-white">
+            <h3 class="text-2xl font-bold mb-4">Let's Connect</h3>
+            <p class="mb-6">
+              I love hearing from readers! Whether you have questions, suggestions, 
+              or just want to say hello, feel free to reach out.
+            </p>
+            <div class="flex space-x-4">
+              <a href="/contact" class="bg-white text-primary-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                Get in Touch
+              </a>
+              <a href="/blog" class="border border-white text-white px-6 py-2 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors">
+                Read Blog
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Posts -->
+  {recentPosts.length > 0 && (
+    <section class="py-16 bg-white dark:bg-gray-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            Recent Posts
+          </h2>
+          <p class="text-gray-600 dark:text-gray-300">
+            Latest articles from my blog
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {recentPosts.map((post) => (
+            <article class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+              {post.data.image && (
+                <img 
+                  src={post.data.image} 
+                  alt={post.data.title}
+                  class="w-full h-48 object-cover"
+                />
+              )}
+              <div class="p-6">
+                <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  <time datetime={post.data.pubDate.toISOString()}>
+                    {post.data.pubDate.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </time>
+                  {post.data.tags && (
+                    <span class="ml-4">
+                      {post.data.tags[0]}
+                    </span>
+                  )}
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                  <a href={`/blog/${post.slug}`} class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                    {post.data.title}
+                  </a>
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                  {post.data.description}
+                </p>
+                <a 
+                  href={`/blog/${post.slug}`}
+                  class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold transition-colors"
+                >
+                  Read more →
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div class="text-center mt-12">
+          <a 
+            href="/blog" 
+            class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+          >
+            View All Posts
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style> 

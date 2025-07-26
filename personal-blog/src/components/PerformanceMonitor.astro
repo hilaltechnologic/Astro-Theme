@@ -1,0 +1,258 @@
+---
+// Performance monitoring component
+---
+
+<script>
+  class PerformanceMonitor {
+    constructor() {
+      this.metrics = {};
+      this.observers = [];
+      this.init();
+    }
+    
+    init() {
+      this.setupCoreWebVitals();
+      this.setupCustomMetrics();
+      this.setupErrorTracking();
+      this.setupResourceTiming();
+    }
+    
+    setupCoreWebVitals() {
+      if ('PerformanceObserver' in window) {
+        // Largest Contentful Paint (LCP)
+        const lcpObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          const lastEntry = entries[entries.length - 1];
+          this.metrics.lcp = lastEntry.startTime;
+          this.reportMetric('LCP', lastEntry.startTime);
+        });
+        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+        
+        // First Input Delay (FID)
+        const fidObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          entries.forEach(entry => {
+            const fid = entry.processingStart - entry.startTime;
+            this.metrics.fid = fid;
+            this.reportMetric('FID', fid);
+          });
+        });
+        fidObserver.observe({ entryTypes: ['first-input'] });
+        
+        // Cumulative Layout Shift (CLS)
+        let clsValue = 0;
+        const clsObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          entries.forEach(entry => {
+            if (!entry.hadRecentInput) {
+              clsValue += entry.value;
+              this.metrics.cls = clsValue;
+              this.reportMetric('CLS', clsValue);
+            }
+          });
+        });
+        clsObserver.observe({ entryTypes: ['layout-shift'] });
+        
+        this.observers.push(lcpObserver, fidObserver, clsObserver);
+      }
+    }
+    
+    setupCustomMetrics() {
+      // Time to First Byte (TTFB)
+      const navigationEntry = performance.getEntriesByType('navigation')[0];
+      if (navigationEntry) {
+        const ttfb = navigationEntry.responseStart - navigationEntry.requestStart;
+        this.metrics.ttfb = ttfb;
+        this.reportMetric('TTFB', ttfb);
+      }
+      
+      // First Contentful Paint (FCP)
+      const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0];
+      if (fcpEntry) {
+        this.metrics.fcp = fcpEntry.startTime;
+        this.reportMetric('FCP', fcpEntry.startTime);
+      }
+      
+      // Total Page Load Time
+      window.addEventListener('load', () => {
+        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+        this.metrics.loadTime = loadTime;
+        this.reportMetric('LoadTime', loadTime);
+      });
+    }
+    
+    setupErrorTracking() {
+      // JavaScript Errors
+      window.addEventListener('error', (event) => {
+        this.reportError('JavaScript Error', {
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno
+        });
+      });
+      
+      // Promise Rejections
+      window.addEventListener('unhandledrejection', (event) => {
+        this.reportError('Unhandled Promise Rejection', {
+          reason: event.reason
+        });
+      });
+      
+      // Resource Loading Errors
+      window.addEventListener('error', (event) => {
+        if (event.target && event.target.tagName) {
+          this.reportError('Resource Loading Error', {
+            tagName: event.target.tagName,
+            src: event.target.src || event.target.href
+          });
+        }
+      }, true);
+    }
+    
+    setupResourceTiming() {
+      if ('PerformanceObserver' in window) {
+        const resourceObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          entries.forEach(entry => {
+            // Track slow resources (> 2 seconds)
+            if (entry.duration > 2000) {
+              this.reportMetric('SlowResource', {
+                name: entry.name,
+                duration: entry.duration,
+                size: entry.transferSize
+              });
+            }
+          });
+        });
+        resourceObserver.observe({ entryTypes: ['resource'] });
+        this.observers.push(resourceObserver);
+      }
+    }
+    
+    reportMetric(name, value) {
+      // Send to analytics service
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'performance_metric', {
+          metric_name: name,
+          metric_value: value,
+          page_url: window.location.href
+        });
+      }
+      
+      // Log to console in development
+      if (import.meta.env.DEV) {
+        console.log(`Performance Metric - ${name}:`, value);
+      }
+      
+      // Store in localStorage for debugging
+      const metrics = JSON.parse(localStorage.getItem('performance_metrics') || '{}');
+      metrics[name] = value;
+      localStorage.setItem('performance_metrics', JSON.stringify(metrics));
+    }
+    
+    reportError(type, details) {
+      // Send to error tracking service
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'exception', {
+          description: type,
+          fatal: false,
+          custom_map: details
+        });
+      }
+      
+      // Log to console in development
+      if (import.meta.env.DEV) {
+        console.error(`Error - ${type}:`, details);
+      }
+    }
+    
+    getMetrics() {
+      return this.metrics;
+    }
+    
+    getScore() {
+      const scores = {
+        lcp: this.getLCPScore(),
+        fid: this.getFIDScore(),
+        cls: this.getCLSScore()
+      };
+      
+      return {
+        scores,
+        average: Object.values(scores).reduce((a, b) => a + b, 0) / Object.keys(scores).length
+      };
+    }
+    
+    getLCPScore() {
+      const lcp = this.metrics.lcp;
+      if (lcp <= 2500) return 1;
+      if (lcp <= 4000) return 0.5;
+      return 0;
+    }
+    
+    getFIDScore() {
+      const fid = this.metrics.fid;
+      if (fid <= 100) return 1;
+      if (fid <= 300) return 0.5;
+      return 0;
+    }
+    
+    getCLSScore() {
+      const cls = this.metrics.cls;
+      if (cls <= 0.1) return 1;
+      if (cls <= 0.25) return 0.5;
+      return 0;
+    }
+    
+    destroy() {
+      this.observers.forEach(observer => observer.disconnect());
+    }
+  }
+  
+  // Initialize performance monitoring
+  window.performanceMonitor = new PerformanceMonitor();
+  
+  // Expose metrics for debugging
+  window.getPerformanceMetrics = () => {
+    return window.performanceMonitor.getMetrics();
+  };
+  
+  window.getPerformanceScore = () => {
+    return window.performanceMonitor.getScore();
+  };
+</script>
+
+<!-- Performance Debug Panel (Development Only) -->
+{import.meta.env.DEV && (
+  <div id="performance-debug" class="fixed bottom-4 right-4 bg-gray-900 text-white p-4 rounded-lg text-sm z-50 max-w-xs">
+    <h3 class="font-semibold mb-2">Performance Metrics</h3>
+    <div id="metrics-display" class="space-y-1">
+      <div>LCP: <span id="lcp-value">-</span></div>
+      <div>FID: <span id="fid-value">-</span></div>
+      <div>CLS: <span id="cls-value">-</span></div>
+      <div>Score: <span id="score-value">-</span></div>
+    </div>
+    <button 
+      onclick="document.getElementById('performance-debug').style.display='none'"
+      class="mt-2 text-xs text-gray-400 hover:text-white"
+    >
+      Close
+    </button>
+  </div>
+)}
+
+<script>
+  // Update debug panel
+  if (import.meta.env.DEV) {
+    setInterval(() => {
+      const metrics = window.getPerformanceMetrics();
+      const score = window.getPerformanceScore();
+      
+      document.getElementById('lcp-value').textContent = metrics.lcp ? `${Math.round(metrics.lcp)}ms` : '-';
+      document.getElementById('fid-value').textContent = metrics.fid ? `${Math.round(metrics.fid)}ms` : '-';
+      document.getElementById('cls-value').textContent = metrics.cls ? metrics.cls.toFixed(3) : '-';
+      document.getElementById('score-value').textContent = score.average ? `${Math.round(score.average * 100)}%` : '-';
+    }, 1000);
+  }
+</script> 

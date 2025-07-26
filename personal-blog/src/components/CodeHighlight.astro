@@ -1,0 +1,218 @@
+---
+// Code syntax highlighting component
+---
+
+<div class="code-highlight-container">
+  <div class="bg-gray-900 rounded-lg overflow-hidden">
+    <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+      <div class="flex items-center space-x-2">
+        <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+        <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <span id="language-label" class="text-xs text-gray-400 font-mono"></span>
+        <button 
+          id="copy-button" 
+          class="text-xs text-gray-400 hover:text-white transition-colors"
+          title="Copy code"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="p-4">
+      <pre id="code-block" class="text-sm text-gray-100 overflow-x-auto"><code><slot /></code></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+  class CodeHighlight {
+    constructor() {
+      this.codeBlock = document.getElementById('code-block');
+      this.languageLabel = document.getElementById('language-label');
+      this.copyButton = document.getElementById('copy-button');
+      
+      if (!this.codeBlock) return;
+      
+      this.init();
+    }
+    
+    init() {
+      this.detectLanguage();
+      this.setupCopyButton();
+      this.highlightSyntax();
+    }
+    
+    detectLanguage() {
+      const codeElement = this.codeBlock.querySelector('code');
+      if (!codeElement) return;
+      
+      // Detect language from class or data attribute
+      const languageClass = Array.from(codeElement.classList).find(cls => 
+        cls.startsWith('language-') || cls.startsWith('lang-')
+      );
+      
+      let language = 'text';
+      if (languageClass) {
+        language = languageClass.replace('language-', '').replace('lang-', '');
+      }
+      
+      // Set language label
+      if (this.languageLabel) {
+        this.languageLabel.textContent = language.toUpperCase();
+      }
+      
+      // Add language class to code element
+      codeElement.classList.add(`language-${language}`);
+    }
+    
+    setupCopyButton() {
+      if (!this.copyButton) return;
+      
+      this.copyButton.addEventListener('click', async () => {
+        const codeText = this.codeBlock.textContent;
+        
+        try {
+          await navigator.clipboard.writeText(codeText);
+          
+          // Show success feedback
+          const originalHTML = this.copyButton.innerHTML;
+          this.copyButton.innerHTML = `
+            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          `;
+          
+          setTimeout(() => {
+            this.copyButton.innerHTML = originalHTML;
+          }, 2000);
+          
+        } catch (err) {
+          console.error('Failed to copy code:', err);
+          
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = codeText;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+        }
+      });
+    }
+    
+    highlightSyntax() {
+      const codeElement = this.codeBlock.querySelector('code');
+      if (!codeElement) return;
+      
+      // Basic syntax highlighting for common languages
+      const code = codeElement.textContent;
+      const language = this.getLanguageFromClass(codeElement);
+      
+      let highlightedCode = code;
+      
+      switch (language) {
+        case 'javascript':
+        case 'js':
+          highlightedCode = this.highlightJavaScript(code);
+          break;
+        case 'html':
+          highlightedCode = this.highlightHTML(code);
+          break;
+        case 'css':
+          highlightedCode = this.highlightCSS(code);
+          break;
+        case 'python':
+        case 'py':
+          highlightedCode = this.highlightPython(code);
+          break;
+        case 'bash':
+        case 'shell':
+          highlightedCode = this.highlightBash(code);
+          break;
+      }
+      
+      codeElement.innerHTML = highlightedCode;
+    }
+    
+    getLanguageFromClass(element) {
+      const languageClass = Array.from(element.classList).find(cls => 
+        cls.startsWith('language-') || cls.startsWith('lang-')
+      );
+      
+      if (languageClass) {
+        return languageClass.replace('language-', '').replace('lang-', '');
+      }
+      
+      return 'text';
+    }
+    
+    highlightJavaScript(code) {
+      return code
+        .replace(/\b(const|let|var|function|return|if|else|for|while|class|import|export|default|async|await)\b/g, '<span class="text-purple-400">$1</span>')
+        .replace(/\b(true|false|null|undefined)\b/g, '<span class="text-orange-400">$1</span>')
+        .replace(/\b(console|document|window|Math|Array|Object|String|Number|Boolean)\b/g, '<span class="text-blue-400">$1</span>')
+        .replace(/(["'`])((?:(?!\1)[^\\]|\\.)*)\1/g, '<span class="text-green-400">$1$2$1</span>')
+        .replace(/\b(\d+)\b/g, '<span class="text-yellow-400">$1</span>')
+        .replace(/(\/\/.*$)/gm, '<span class="text-gray-500">$1</span>')
+        .replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="text-gray-500">$1</span>');
+    }
+    
+    highlightHTML(code) {
+      return code
+        .replace(/(&lt;\/?)([a-zA-Z][a-zA-Z0-9]*)([^&]*?)(&gt;)/g, '<span class="text-blue-400">$1</span><span class="text-orange-400">$2</span><span class="text-gray-300">$3</span><span class="text-blue-400">$4</span>')
+        .replace(/([a-zA-Z-]+)=/g, '<span class="text-green-400">$1</span>=')
+        .replace(/(["'])((?:(?!\1)[^\\]|\\.)*)\1/g, '<span class="text-yellow-400">$1$2$1</span>');
+    }
+    
+    highlightCSS(code) {
+      return code
+        .replace(/([a-zA-Z-]+):/g, '<span class="text-green-400">$1</span>:')
+        .replace(/(["'])((?:(?!\1)[^\\]|\\.)*)\1/g, '<span class="text-yellow-400">$1$2$1</span>')
+        .replace(/\b(px|em|rem|%|vh|vw)\b/g, '<span class="text-purple-400">$1</span>')
+        .replace(/\b(#[0-9a-fA-F]{3,6})\b/g, '<span class="text-orange-400">$1</span>')
+        .replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="text-gray-500">$1</span>');
+    }
+    
+    highlightPython(code) {
+      return code
+        .replace(/\b(def|class|import|from|as|return|if|else|elif|for|while|try|except|finally|with|in|is|and|or|not|True|False|None)\b/g, '<span class="text-purple-400">$1</span>')
+        .replace(/\b(print|len|str|int|float|list|dict|set|tuple)\b/g, '<span class="text-blue-400">$1</span>')
+        .replace(/(["'`])((?:(?!\1)[^\\]|\\.)*)\1/g, '<span class="text-green-400">$1$2$1</span>')
+        .replace(/\b(\d+)\b/g, '<span class="text-yellow-400">$1</span>')
+        .replace(/(#.*$)/gm, '<span class="text-gray-500">$1</span>');
+    }
+    
+    highlightBash(code) {
+      return code
+        .replace(/^\$ /gm, '<span class="text-green-400">$ </span>')
+        .replace(/\b(cd|ls|mkdir|rm|cp|mv|cat|echo|grep|find|chmod|chown|sudo|apt|yum|brew|git|npm|yarn)\b/g, '<span class="text-blue-400">$1</span>')
+        .replace(/(["'`])((?:(?!\1)[^\\]|\\.)*)\1/g, '<span class="text-yellow-400">$1$2$1</span>')
+        .replace(/(#.*$)/gm, '<span class="text-gray-500">$1</span>');
+    }
+  }
+  
+  // Initialize code highlighting when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    new CodeHighlight();
+  });
+</script>
+
+<style>
+  .code-highlight-container {
+    margin: 2rem 0;
+  }
+  
+  .code-highlight-container pre {
+    font-family: 'Fira Code', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+    line-height: 1.5;
+  }
+  
+  .code-highlight-container code {
+    font-family: inherit;
+  }
+</style> 

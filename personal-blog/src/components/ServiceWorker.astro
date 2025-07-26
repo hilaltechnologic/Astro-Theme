@@ -1,0 +1,302 @@
+---
+// Service Worker for caching and offline support
+---
+
+<script>
+  // Service Worker Registration
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('SW registered: ', registration);
+        })
+        .catch(registrationError => {
+          console.log('SW registration failed: ', registrationError);
+        });
+    });
+  }
+</script>
+
+<!-- Service Worker File -->
+<script>
+  // Create service worker content
+  const swContent = `
+    const CACHE_NAME = 'astro-blog-v1';
+    const urlsToCache = [
+      '/',
+      '/blog',
+      '/about',
+      '/contact',
+      '/styles.css',
+      '/scripts.js',
+      '/favicon.svg',
+      '/manifest.json'
+    ];
+
+    // Install event - cache resources
+    self.addEventListener('install', event => {
+      event.waitUntil(
+        caches.open(CACHE_NAME)
+          .then(cache => {
+            console.log('Opened cache');
+            return cache.addAll(urlsToCache);
+          })
+      );
+    });
+
+    // Fetch event - serve from cache, fallback to network
+    self.addEventListener('fetch', event => {
+      event.respondWith(
+        caches.match(event.request)
+          .then(response => {
+            // Return cached version or fetch from network
+            return response || fetch(event.request)
+              .then(response => {
+                // Check if we received a valid response
+                if (!response || response.status !== 200 || response.type !== 'basic') {
+                  return response;
+                }
+
+                // Clone the response
+                const responseToCache = response.clone();
+
+                caches.open(CACHE_NAME)
+                  .then(cache => {
+                    cache.put(event.request, responseToCache);
+                  });
+
+                return response;
+              });
+          })
+      );
+    });
+
+    // Activate event - clean up old caches
+    self.addEventListener('activate', event => {
+      event.waitUntil(
+        caches.keys().then(cacheNames => {
+          return Promise.all(
+            cacheNames.map(cacheName => {
+              if (cacheName !== CACHE_NAME) {
+                console.log('Deleting old cache:', cacheName);
+                return caches.delete(cacheName);
+              }
+            })
+          );
+        })
+      );
+    });
+
+    // Background sync for offline content
+    self.addEventListener('sync', event => {
+      if (event.tag === 'background-sync') {
+        event.waitUntil(doBackgroundSync());
+      }
+    });
+
+    // Push notifications
+    self.addEventListener('push', event => {
+      const options = {
+        body: event.data ? event.data.text() : 'New content available!',
+        icon: '/icon-192x192.png',
+        badge: '/badge-72x72.png',
+        vibrate: [100, 50, 100],
+        data: {
+          dateOfArrival: Date.now(),
+          primaryKey: 1
+        },
+        actions: [
+          {
+            action: 'explore',
+            title: 'View',
+            icon: '/icon-192x192.png'
+          },
+          {
+            action: 'close',
+            title: 'Close',
+            icon: '/icon-192x192.png'
+          }
+        ]
+      };
+
+      event.waitUntil(
+        self.registration.showNotification('Blog Update', options)
+      );
+    });
+
+    // Notification click
+    self.addEventListener('notificationclick', event => {
+      event.notification.close();
+
+      if (event.action === 'explore') {
+        event.waitUntil(
+          clients.openWindow('/')
+        );
+      }
+    });
+
+    // Background sync function
+    async function doBackgroundSync() {
+      try {
+        // Sync any pending data
+        const response = await fetch('/api/sync', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            timestamp: Date.now(),
+            data: 'offline_data'
+          })
+        });
+
+        if (response.ok) {
+          console.log('Background sync successful');
+        }
+      } catch (error) {
+        console.error('Background sync failed:', error);
+      }
+    }
+
+    // Cache strategies
+    const cacheStrategies = {
+      // Cache first, fallback to network
+      cacheFirst: async (request) => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedResponse = await cache.match(request);
+        
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        
+        try {
+          const networkResponse = await fetch(request);
+          cache.put(request, networkResponse.clone());
+          return networkResponse;
+        } catch (error) {
+          return new Response('Offline content not available', {
+            status: 503,
+            statusText: 'Service Unavailable'
+          });
+        }
+      },
+
+      // Network first, fallback to cache
+      networkFirst: async (request) => {
+        try {
+          const networkResponse = await fetch(request);
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(request, networkResponse.clone());
+          return networkResponse;
+        } catch (error) {
+          const cachedResponse = await caches.match(request);
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          return new Response('Offline content not available', {
+            status: 503,
+            statusText: 'Service Unavailable'
+          });
+        }
+      },
+
+      // Stale while revalidate
+      staleWhileRevalidate: async (request) => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedResponse = await cache.match(request);
+        
+        const fetchPromise = fetch(request).then(networkResponse => {
+          cache.put(request, networkResponse.clone());
+          return networkResponse;
+        });
+        
+        return cachedResponse || fetchPromise;
+      }
+    };
+
+    // Route specific caching strategies
+    const routeStrategies = {
+      '/': cacheStrategies.cacheFirst,
+      '/blog': cacheStrategies.networkFirst,
+      '/api/': cacheStrategies.networkFirst,
+      '/images/': cacheStrategies.cacheFirst,
+      '/fonts/': cacheStrategies.cacheFirst
+    };
+
+    // Enhanced fetch with route-based strategies
+    self.addEventListener('fetch', event => {
+      const url = new URL(event.request.url);
+      const path = url.pathname;
+      
+      // Find matching strategy
+      let strategy = cacheStrategies.networkFirst; // default
+      
+      for (const [route, routeStrategy] of Object.entries(routeStrategies)) {
+        if (path.startsWith(route)) {
+          strategy = routeStrategy;
+          break;
+        }
+      }
+      
+      event.respondWith(strategy(event.request));
+    });
+  `;
+
+  // Create service worker file
+  const blob = new Blob([swContent], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register(swUrl)
+      .then(registration => {
+        console.log('Service Worker registered successfully');
+      })
+      .catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
+  }
+</script>
+
+<!-- Offline Support -->
+<div id="offline-indicator" class="fixed top-4 right-4 bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 hidden">
+  <div class="flex items-center">
+    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+    </svg>
+    <span>You're offline. Some features may be limited.</span>
+  </div>
+</div>
+
+<script>
+  // Offline detection
+  window.addEventListener('online', () => {
+    document.getElementById('offline-indicator').classList.add('hidden');
+  });
+  
+  window.addEventListener('offline', () => {
+    document.getElementById('offline-indicator').classList.remove('hidden');
+  });
+  
+  // Check initial online status
+  if (!navigator.onLine) {
+    document.getElementById('offline-indicator').classList.remove('hidden');
+  }
+</script>
+
+<style>
+  #offline-indicator {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+</style> 
