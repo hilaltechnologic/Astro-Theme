@@ -8,11 +8,10 @@ const blog = defineCollection({
     pubDate: z.date(),
     updatedDate: z.date().optional(),
     heroImage: z.string().optional(),
-    image: z.string().optional(),
-    author: z.string().optional(),
     tags: z.array(z.string()).default([]),
-    featured: z.boolean().default(false),
-    readingTime: z.number().optional(),
+    category: z.string().default('Uncategorized'),
+    author: z.string().default('Unknown'),
+    readingTime: z.number().default(0),
   }),
 });
 

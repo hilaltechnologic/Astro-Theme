@@ -1,0 +1,349 @@
+---
+// This component provides search analytics and insights
+---
+
+<div id="search-analytics" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+  <div class="flex items-center justify-between mb-6">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Search Analytics</h3>
+    <button 
+      id="export-analytics"
+      class="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
+    >
+      Export Data
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Search Stats -->
+    <div class="space-y-4">
+      <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Search Statistics</h4>
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Total Searches</span>
+          <span id="total-searches" class="text-lg font-semibold text-gray-900 dark:text-white">0</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Unique Searches</span>
+          <span id="unique-searches" class="text-lg font-semibold text-gray-900 dark:text-white">0</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Avg. Results</span>
+          <span id="avg-results" class="text-lg font-semibold text-gray-900 dark:text-white">0</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Success Rate</span>
+          <span id="success-rate" class="text-lg font-semibold text-green-600">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popular Searches -->
+    <div class="space-y-4">
+      <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Popular Searches</h4>
+      <div id="popular-searches-list" class="space-y-2">
+        <!-- Popular searches will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Search Performance -->
+    <div class="space-y-4">
+      <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Performance</h4>
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Avg. Search Time</span>
+          <span id="avg-search-time" class="text-lg font-semibold text-gray-900 dark:text-white">0ms</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Zero Results</span>
+          <span id="zero-results" class="text-lg font-semibold text-red-600">0</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Most Used Filter</span>
+          <span id="most-used-filter" class="text-lg font-semibold text-gray-900 dark:text-white">-</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Trends Chart -->
+  <div class="mt-8">
+    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-4">Search Trends (Last 7 Days)</h4>
+    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+      <canvas id="search-trends-chart" width="400" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Recent Search Activity -->
+  <div class="mt-8">
+    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-4">Recent Search Activity</h4>
+    <div id="recent-activity" class="space-y-2 max-h-48 overflow-y-auto">
+      <!-- Recent activity will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<script>
+  class SearchAnalytics {
+    constructor() {
+      this.searchData = this.loadSearchData();
+      this.init();
+    }
+
+    init() {
+      this.updateStatistics();
+      this.updatePopularSearches();
+      this.updatePerformance();
+      this.updateRecentActivity();
+      this.initChart();
+      this.bindEvents();
+    }
+
+    loadSearchData() {
+      try {
+        return JSON.parse(localStorage.getItem('searchAnalytics') || '{}');
+      } catch {
+        return {};
+      }
+    }
+
+    saveSearchData() {
+      localStorage.setItem('searchAnalytics', JSON.stringify(this.searchData));
+    }
+
+    recordSearch(searchTerm, filters, resultsCount, searchTime) {
+      const timestamp = new Date().toISOString();
+      const searchId = `${timestamp}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      if (!this.searchData.searches) {
+        this.searchData.searches = [];
+      }
+      
+      this.searchData.searches.push({
+        id: searchId,
+        term: searchTerm,
+        filters: filters,
+        resultsCount: resultsCount,
+        searchTime: searchTime,
+        timestamp: timestamp,
+        success: resultsCount > 0
+      });
+      
+      // Keep only last 100 searches
+      if (this.searchData.searches.length > 100) {
+        this.searchData.searches = this.searchData.searches.slice(-100);
+      }
+      
+      this.saveSearchData();
+      this.updateStatistics();
+    }
+
+    updateStatistics() {
+      const searches = this.searchData.searches || [];
+      const totalSearches = searches.length;
+      const uniqueSearches = new Set(searches.map(s => s.term)).size;
+      const avgResults = searches.length > 0 ? 
+        Math.round(searches.reduce((sum, s) => sum + s.resultsCount, 0) / searches.length) : 0;
+      const successRate = searches.length > 0 ? 
+        Math.round((searches.filter(s => s.success).length / searches.length) * 100) : 0;
+
+      document.getElementById('total-searches').textContent = totalSearches;
+      document.getElementById('unique-searches').textContent = uniqueSearches;
+      document.getElementById('avg-results').textContent = avgResults;
+      document.getElementById('success-rate').textContent = `${successRate}%`;
+    }
+
+    updatePopularSearches() {
+      const searches = this.searchData.searches || [];
+      const searchCounts = {};
+      
+      searches.forEach(search => {
+        if (search.term) {
+          searchCounts[search.term] = (searchCounts[search.term] || 0) + 1;
+        }
+      });
+      
+      const popularSearches = Object.entries(searchCounts)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5);
+      
+      const container = document.getElementById('popular-searches-list');
+      if (container) {
+        container.innerHTML = '';
+        
+        popularSearches.forEach(([term, count]) => {
+          const div = document.createElement('div');
+          div.className = 'flex justify-between items-center text-sm';
+          div.innerHTML = `
+            <span class="text-gray-700 dark:text-gray-300 truncate">${term}</span>
+            <span class="text-gray-900 dark:text-white font-medium">${count}</span>
+          `;
+          container.appendChild(div);
+        });
+      }
+    }
+
+    updatePerformance() {
+      const searches = this.searchData.searches || [];
+      const avgSearchTime = searches.length > 0 ? 
+        Math.round(searches.reduce((sum, s) => sum + s.searchTime, 0) / searches.length) : 0;
+      const zeroResults = searches.filter(s => s.resultsCount === 0).length;
+      
+      // Find most used filter
+      const filterCounts = {};
+      searches.forEach(search => {
+        if (search.filters) {
+          Object.keys(search.filters).forEach(filter => {
+            if (search.filters[filter] && search.filters[filter].length > 0) {
+              filterCounts[filter] = (filterCounts[filter] || 0) + 1;
+            }
+          });
+        }
+      });
+      
+      const mostUsedFilter = Object.keys(filterCounts).length > 0 ? 
+        Object.entries(filterCounts).sort(([,a], [,b]) => b - a)[0][0] : '-';
+      
+      document.getElementById('avg-search-time').textContent = `${avgSearchTime}ms`;
+      document.getElementById('zero-results').textContent = zeroResults;
+      document.getElementById('most-used-filter').textContent = mostUsedFilter;
+    }
+
+    updateRecentActivity() {
+      const searches = this.searchData.searches || [];
+      const recentSearches = searches.slice(-10).reverse();
+      
+      const container = document.getElementById('recent-activity');
+      if (container) {
+        container.innerHTML = '';
+        
+        recentSearches.forEach(search => {
+          const div = document.createElement('div');
+          div.className = 'flex justify-between items-center text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded';
+          div.innerHTML = `
+            <div class="flex-1">
+              <div class="text-gray-900 dark:text-white font-medium">${search.term || 'No search term'}</div>
+              <div class="text-gray-500 dark:text-gray-400 text-xs">
+                ${new Date(search.timestamp).toLocaleString()}
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-gray-900 dark:text-white">${search.resultsCount} results</div>
+              <div class="text-gray-500 dark:text-gray-400 text-xs">${search.searchTime}ms</div>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      }
+    }
+
+    initChart() {
+      const canvas = document.getElementById('search-trends-chart');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const searches = this.searchData.searches || [];
+      
+      // Get last 7 days
+      const last7Days = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        last7Days.push(date.toISOString().split('T')[0]);
+      }
+      
+      // Count searches per day
+      const searchCounts = {};
+      last7Days.forEach(date => {
+        searchCounts[date] = searches.filter(s => 
+          s.timestamp.startsWith(date)
+        ).length;
+      });
+      
+      // Create chart data
+      const data = {
+        labels: last7Days.map(date => new Date(date).toLocaleDateString('en-US', { weekday: 'short' })),
+        datasets: [{
+          label: 'Searches',
+          data: last7Days.map(date => searchCounts[date]),
+          borderColor: '#0ea5e9',
+          backgroundColor: 'rgba(14, 165, 233, 0.1)',
+          tension: 0.4
+        }]
+      };
+      
+      // Simple chart implementation (you could use Chart.js for better charts)
+      this.drawSimpleChart(ctx, data);
+    }
+
+    drawSimpleChart(ctx, data) {
+      const width = ctx.canvas.width;
+      const height = ctx.canvas.height;
+      const padding = 40;
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+      
+      // Draw axes
+      ctx.strokeStyle = '#9ca3af';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padding, padding);
+      ctx.lineTo(padding, height - padding);
+      ctx.lineTo(width - padding, height - padding);
+      ctx.stroke();
+      
+      // Draw data points
+      const maxValue = Math.max(...data.datasets[0].data);
+      const xStep = (width - 2 * padding) / (data.labels.length - 1);
+      const yStep = (height - 2 * padding) / maxValue;
+      
+      ctx.strokeStyle = '#0ea5e9';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      
+      data.datasets[0].data.forEach((value, index) => {
+        const x = padding + index * xStep;
+        const y = height - padding - value * yStep;
+        
+        if (index === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+        
+        // Draw point
+        ctx.fillStyle = '#0ea5e9';
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+      
+      ctx.stroke();
+    }
+
+    bindEvents() {
+      document.getElementById('export-analytics')?.addEventListener('click', () => {
+        this.exportData();
+      });
+    }
+
+    exportData() {
+      const dataStr = JSON.stringify(this.searchData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `search-analytics-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  // Initialize search analytics
+  const searchAnalytics = new SearchAnalytics();
+
+  // Expose to global scope for integration with search components
+  window.searchAnalytics = searchAnalytics;
+</script> 

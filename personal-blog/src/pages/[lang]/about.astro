@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getLanguageFromUrl, supportedLanguages, type Language } from '../../i18n/config';
+import { getTranslation } from '../../i18n/index';
+
+// Get language from URL
+const lang = getLanguageFromUrl(Astro.url);
+
+// Validate language
+if (!supportedLanguages.includes(lang)) {
+  return Astro.redirect('/about');
+}
+---
+
+<BaseLayout 
+  title={getTranslation('about.title', lang)} 
+  description={getTranslation('about.subtitle', lang)}
+  lang={lang}
+>
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <Header currentLang={lang} />
+    
+    <!-- About Header -->
+    <section class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-16">
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+          <h1 class="text-4xl md:text-5xl font-bold mb-6">
+            {getTranslation('about.title', lang)}
+          </h1>
+          <p class="text-xl text-white/90">
+            {getTranslation('about.subtitle', lang)}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="py-16">
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+                {getTranslation('about.content.intro', lang)}
+              </h2>
+              <p class="text-lg text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                {getTranslation('about.content.experience', lang)}
+              </p>
+              <p class="text-lg text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                {getTranslation('about.content.skills', lang)}
+              </p>
+              <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+                {getTranslation('about.content.contact', lang)}
+              </p>
+              <a 
+                href={`/${lang === 'en' ? '' : lang}/contact`}
+                class="inline-flex items-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                {getTranslation('contact.title', lang)}
+              </a>
+            </div>
+            <div class="text-center">
+              <div class="w-64 h-64 mx-auto bg-gradient-to-br from-primary-400 to-secondary-500 rounded-full flex items-center justify-center">
+                <svg class="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Footer currentLang={lang} />
+  </div>
+</BaseLayout> 

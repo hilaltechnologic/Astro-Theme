@@ -1,0 +1,518 @@
+---
+import { getCollection } from 'astro:content';
+
+// Get all posts for search data
+const posts = await getCollection('blog');
+const allTags = [...new Set(posts.flatMap(post => post.data.tags || []))];
+const allCategories = [...new Set(posts.map(post => post.data.category || 'Uncategorized'))];
+const allAuthors = [...new Set(posts.map(post => post.data.author || 'Unknown'))];
+
+// Get date range for filtering
+const dates = posts.map(post => post.data.pubDate);
+const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+---
+
+<div class="advanced-search-filter bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Search Input -->
+    <div class="lg:col-span-2">
+      <label for="advanced-search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Search Posts
+      </label>
+      <div class="relative">
+        <input 
+          type="text" 
+          id="advanced-search"
+          placeholder="Search by title, content, tags, or author..."
+          class="w-full px-4 py-3 pl-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        />
+        <svg class="absolute left-4 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Date Range Filter -->
+    <div>
+      <label for="date-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Date Range
+      </label>
+      <select 
+        id="date-filter"
+        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+      >
+        <option value="all">All Time</option>
+        <option value="today">Today</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+        <option value="quarter">This Quarter</option>
+        <option value="year">This Year</option>
+        <option value="custom">Custom Range</option>
+      </select>
+    </div>
+
+    <!-- Sort By -->
+    <div>
+      <label for="sort-by" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Sort By
+      </label>
+      <select 
+        id="sort-by"
+        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+      >
+        <option value="date-desc">Newest First</option>
+        <option value="date-asc">Oldest First</option>
+        <option value="title-asc">Title A-Z</option>
+        <option value="title-desc">Title Z-A</option>
+        <option value="reading-time">Reading Time</option>
+        <option value="author">Author</option>
+        <option value="popularity">Most Popular</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Advanced Filters -->
+  <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+    <!-- Tags Filter -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Tags
+      </label>
+      <div class="max-h-32 overflow-y-auto space-y-2">
+        {allTags.map((tag) => (
+          <label class="flex items-center">
+            <input 
+              type="checkbox" 
+              value={tag}
+              class="tag-filter-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            />
+            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{tag}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+
+    <!-- Categories Filter -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Categories
+      </label>
+      <div class="max-h-32 overflow-y-auto space-y-2">
+        {allCategories.map((category) => (
+          <label class="flex items-center">
+            <input 
+              type="checkbox" 
+              value={category}
+              class="category-filter-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            />
+            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{category}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+
+    <!-- Authors Filter -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Authors
+      </label>
+      <div class="max-h-32 overflow-y-auto space-y-2">
+        {allAuthors.map((author) => (
+          <label class="flex items-center">
+            <input 
+              type="checkbox" 
+              value={author}
+              class="author-filter-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            />
+            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{author}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+
+    <!-- Reading Time Filter -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Reading Time
+      </label>
+      <div class="space-y-2">
+        <label class="flex items-center">
+          <input type="checkbox" value="0-5" class="reading-time-filter rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+          <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">0-5 minutes</span>
+        </label>
+        <label class="flex items-center">
+          <input type="checkbox" value="5-10" class="reading-time-filter rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+          <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">5-10 minutes</span>
+        </label>
+        <label class="flex items-center">
+          <input type="checkbox" value="10-15" class="reading-time-filter rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+          <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">10-15 minutes</span>
+        </label>
+        <label class="flex items-center">
+          <input type="checkbox" value="15+" class="reading-time-filter rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+          <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">15+ minutes</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Actions -->
+  <div class="mt-6 flex flex-wrap gap-3">
+    <button 
+      id="apply-filters"
+      class="px-6 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
+    >
+      Apply Filters
+    </button>
+    <button 
+      id="clear-filters"
+      class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+    >
+      Clear All
+    </button>
+    <button 
+      id="save-search"
+      class="px-6 py-2 border border-primary-600 text-primary-600 dark:text-primary-400 font-medium rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+    >
+      Save Search
+    </button>
+    <button 
+      id="toggle-analytics"
+      class="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+    >
+      Show Analytics
+    </button>
+  </div>
+
+  <!-- Search Results Summary -->
+  <div id="search-summary" class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+    Showing <span id="results-count">0</span> of <span id="total-posts">{posts.length}</span> posts
+  </div>
+</div>
+
+<script>
+  // Enhanced Advanced Search & Filter functionality
+  class AdvancedSearchFilter {
+    constructor() {
+      this.posts = [];
+      this.filteredPosts = [];
+      this.filters = {
+        search: '',
+        dateRange: 'all',
+        sortBy: 'date-desc',
+        tags: [],
+        categories: [],
+        authors: [],
+        readingTime: []
+      };
+      
+      this.init();
+    }
+
+    async init() {
+      // Fetch posts data (this would be replaced with actual data fetching)
+      this.posts = await this.fetchPosts();
+      this.filteredPosts = [...this.posts];
+      
+      this.bindEvents();
+      this.updateResults();
+    }
+
+    async fetchPosts() {
+      // In a real implementation, this would fetch from your API
+      // For now, we'll use the posts data from the server
+      return [];
+    }
+
+    bindEvents() {
+      // Search input
+      const searchInput = document.getElementById('advanced-search');
+      searchInput?.addEventListener('input', (e) => {
+        this.filters.search = e.target.value.toLowerCase();
+        this.applyFilters();
+      });
+
+      // Date filter
+      const dateFilter = document.getElementById('date-filter');
+      dateFilter?.addEventListener('change', (e) => {
+        this.filters.dateRange = e.target.value;
+        this.applyFilters();
+      });
+
+      // Sort by
+      const sortBy = document.getElementById('sort-by');
+      sortBy?.addEventListener('change', (e) => {
+        this.filters.sortBy = e.target.value;
+        this.applyFilters();
+      });
+
+      // Tag filters
+      const tagCheckboxes = document.querySelectorAll('.tag-filter-checkbox');
+      tagCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          this.updateTagFilters();
+          this.applyFilters();
+        });
+      });
+
+      // Category filters
+      const categoryCheckboxes = document.querySelectorAll('.category-filter-checkbox');
+      categoryCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          this.updateCategoryFilters();
+          this.applyFilters();
+        });
+      });
+
+      // Author filters
+      const authorCheckboxes = document.querySelectorAll('.author-filter-checkbox');
+      authorCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          this.updateAuthorFilters();
+          this.applyFilters();
+        });
+      });
+
+      // Reading time filters
+      const readingTimeCheckboxes = document.querySelectorAll('.reading-time-filter');
+      readingTimeCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          this.updateReadingTimeFilters();
+          this.applyFilters();
+        });
+      });
+
+      // Action buttons
+      document.getElementById('apply-filters')?.addEventListener('click', () => {
+        this.applyFilters();
+      });
+
+      document.getElementById('clear-filters')?.addEventListener('click', () => {
+        this.clearAllFilters();
+      });
+
+      document.getElementById('save-search')?.addEventListener('click', () => {
+        this.saveSearch();
+      });
+
+      document.getElementById('toggle-analytics')?.addEventListener('click', () => {
+        this.toggleAnalytics();
+      });
+    }
+
+    updateTagFilters() {
+      const checkedTags = document.querySelectorAll('.tag-filter-checkbox:checked');
+      this.filters.tags = Array.from(checkedTags).map(cb => cb.value);
+    }
+
+    updateCategoryFilters() {
+      const checkedCategories = document.querySelectorAll('.category-filter-checkbox:checked');
+      this.filters.categories = Array.from(checkedCategories).map(cb => cb.value);
+    }
+
+    updateAuthorFilters() {
+      const checkedAuthors = document.querySelectorAll('.author-filter-checkbox:checked');
+      this.filters.authors = Array.from(checkedAuthors).map(cb => cb.value);
+    }
+
+    updateReadingTimeFilters() {
+      const checkedReadingTimes = document.querySelectorAll('.reading-time-filter:checked');
+      this.filters.readingTime = Array.from(checkedReadingTimes).map(cb => cb.value);
+    }
+
+    applyFilters() {
+      let visibleCount = 0;
+
+      this.posts.forEach(post => {
+        const title = post.title.toLowerCase();
+        const description = post.description.toLowerCase();
+        const tags = post.tags?.join(' ').toLowerCase() || '';
+        const author = post.author?.toLowerCase() || '';
+        const category = post.category?.toLowerCase() || '';
+        
+        const matchesSearch = this.filters.search === '' || 
+          title.includes(this.filters.search) || 
+          description.includes(this.filters.search) ||
+          tags.includes(this.filters.search) ||
+          author.includes(this.filters.search);
+        
+        const matchesDate = this.filters.dateRange === 'all' || 
+          this.matchesDateRange(post.pubDate, this.filters.dateRange);
+        
+        const matchesTag = this.filters.tags.length === 0 || 
+          post.tags?.some(tag => this.filters.tags.includes(tag));
+
+        const matchesCategory = this.filters.categories.length === 0 || 
+          this.filters.categories.includes(post.category);
+
+        const matchesAuthor = this.filters.authors.length === 0 || 
+          this.filters.authors.includes(post.author);
+
+        const matchesReadingTime = this.filters.readingTime.length === 0 || 
+          this.matchesReadingTime(post.readingTime, this.filters.readingTime);
+
+        if (matchesSearch && matchesDate && matchesTag && matchesCategory && matchesAuthor && matchesReadingTime) {
+          post.element.style.display = 'block';
+          visibleCount++;
+        } else {
+          post.element.style.display = 'none';
+        }
+      });
+
+      // Sort results
+      this.sortResults();
+
+      // Show/hide no results message
+      const noResults = document.getElementById('no-results');
+      const postsGrid = document.getElementById('posts-grid');
+      
+      if (visibleCount === 0) {
+        noResults?.classList.remove('hidden');
+        postsGrid?.classList.add('hidden');
+      } else {
+        noResults?.classList.add('hidden');
+        postsGrid?.classList.remove('hidden');
+      }
+
+      // Update results count
+      const resultsCount = document.getElementById('results-count');
+      const totalPosts = document.getElementById('total-posts');
+      
+      if (resultsCount) resultsCount.textContent = visibleCount;
+      if (totalPosts) totalPosts.textContent = this.posts.length;
+    }
+
+    matchesDateRange(postDate, dateRange) {
+      const now = new Date();
+      const postDateObj = new Date(postDate);
+      
+      switch (dateRange) {
+        case 'today':
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          return postDateObj >= today;
+        case 'week':
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          return postDateObj >= weekAgo;
+        case 'month':
+          const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+          return postDateObj >= monthAgo;
+        case 'quarter':
+          const quarterAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+          return postDateObj >= quarterAgo;
+        case 'year':
+          const yearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+          return postDateObj >= yearAgo;
+        default:
+          return true;
+      }
+    }
+
+    matchesReadingTime(readingTime, ranges) {
+      return ranges.some(range => {
+        const [min, max] = range.split('-').map(Number);
+        if (max) {
+          return readingTime >= min && readingTime <= max;
+        } else {
+          return readingTime >= min;
+        }
+      });
+    }
+
+    sortResults() {
+      const sortBy = this.filters.sortBy;
+      const visiblePosts = this.posts.filter(post => post.element.style.display !== 'none');
+      
+      visiblePosts.sort((a, b) => {
+        switch (sortBy) {
+          case 'date-desc':
+            return new Date(b.pubDate) - new Date(a.pubDate);
+          case 'date-asc':
+            return new Date(a.pubDate) - new Date(b.pubDate);
+          case 'title-asc':
+            return a.title.localeCompare(b.title);
+          case 'title-desc':
+            return b.title.localeCompare(a.title);
+          case 'reading-time':
+            return (b.readingTime || 0) - (a.readingTime || 0);
+          case 'author':
+            return (a.author || '').localeCompare(b.author || '');
+          case 'popularity':
+            return (b.views || 0) - (a.views || 0);
+          default:
+            return 0;
+        }
+      });
+
+      // Reorder DOM elements
+      const postsGrid = document.getElementById('posts-grid');
+      if (postsGrid) {
+        visiblePosts.forEach(post => {
+          postsGrid.appendChild(post.element);
+        });
+      }
+    }
+
+    clearAllFilters() {
+      // Reset all filters
+      this.filters = {
+        search: '',
+        dateRange: 'all',
+        sortBy: 'date-desc',
+        tags: [],
+        categories: [],
+        authors: [],
+        readingTime: []
+      };
+
+      // Reset UI
+      const searchInput = document.getElementById('advanced-search');
+      if (searchInput) searchInput.value = '';
+
+      const dateFilter = document.getElementById('date-filter');
+      if (dateFilter) dateFilter.value = 'all';
+
+      const sortBy = document.getElementById('sort-by');
+      if (sortBy) sortBy.value = 'date-desc';
+
+      // Uncheck all checkboxes
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+      });
+
+      // Apply filters
+      this.applyFilters();
+    }
+
+    saveSearch() {
+      const searchName = prompt('Enter a name for this search:');
+      if (searchName) {
+        const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+        savedSearches.push({
+          name: searchName,
+          filters: this.filters,
+          timestamp: new Date().toISOString()
+        });
+        
+        localStorage.setItem('savedSearches', JSON.stringify(savedSearches));
+        alert('Search saved successfully!');
+      }
+    }
+
+    toggleAnalytics() {
+      const analyticsSection = document.getElementById('search-analytics-section');
+      if (analyticsSection) {
+        const isHidden = analyticsSection.classList.contains('hidden');
+        analyticsSection.classList.toggle('hidden');
+        
+        const button = document.getElementById('toggle-analytics');
+        if (button) {
+          button.textContent = isHidden ? 'Hide Analytics' : 'Show Analytics';
+        }
+      }
+    }
+  }
+
+  // Initialize the advanced search filter
+  new AdvancedSearchFilter();
+</script> 

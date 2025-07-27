@@ -1,13 +1,4 @@
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://astro-blog-theme-demo.pages.dev/sitemap-index.xml
-
-# Disallow private pages
-Disallow: /private/
-Disallow: /admin/
-Disallow: /api/
-
-# Crawl delay
-Crawl-delay: 1 
+Sitemap: https://yourdomain.com/sitemap-index.xml 

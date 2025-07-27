@@ -1,0 +1,224 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getCollection } from 'astro:content';
+import { getLanguageFromUrl, supportedLanguages, type Language } from '../../i18n/config';
+import { getTranslation } from '../../i18n/index';
+
+// Get language from URL
+const lang = getLanguageFromUrl(Astro.url);
+
+// Validate language
+if (!supportedLanguages.includes(lang)) {
+  return Astro.redirect('/');
+}
+
+// Get latest posts
+const posts = await getCollection('blog');
+const sortedPosts = posts
+  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
+  .slice(0, 3);
+
+// Format dates based on language
+const formatDate = (date: Date, language: Language) => {
+  return new Intl.DateTimeFormat(language === 'en' ? 'en-US' : language === 'id' ? 'id-ID' : 'en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
+---
+
+<BaseLayout 
+  title={getTranslation('home.hero.title', lang)} 
+  description={getTranslation('home.hero.subtitle', lang)}
+  lang={lang}
+>
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <Header currentLang={lang} />
+    
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-20">
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+          <h1 class="text-4xl md:text-6xl font-bold mb-6">
+            {getTranslation('home.hero.title', lang)}
+          </h1>
+          <p class="text-xl md:text-2xl text-white/90 mb-8">
+            {getTranslation('home.hero.subtitle', lang)}
+          </p>
+          <a 
+            href={`/${lang === 'en' ? '' : lang}/blog`}
+            class="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+          >
+            {getTranslation('home.hero.cta', lang)}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest Posts Section -->
+    <section class="py-16">
+      <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+          <div class="flex items-center justify-between mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
+              {getTranslation('home.latestPosts.title', lang)}
+            </h2>
+            <a 
+              href={`/${lang === 'en' ? '' : lang}/blog`}
+              class="text-primary-600 dark:text-primary-400 hover:underline font-medium"
+            >
+              {getTranslation('home.latestPosts.viewAll', lang)}
+            </a>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {sortedPosts.map((post) => (
+              <article class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                {post.data.heroImage && (
+                  <div class="aspect-video overflow-hidden">
+                    <img 
+                      src={post.data.heroImage} 
+                      alt={post.data.title}
+                      class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                )}
+                <div class="p-6">
+                  <div class="flex items-center gap-2 mb-3">
+                    {post.data.tags?.slice(0, 3).map((tag) => (
+                      <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 text-xs font-medium rounded">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
+                    {post.data.title}
+                  </h3>
+                  <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                    {post.data.description}
+                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                      {formatDate(post.data.pubDate, lang)}
+                    </span>
+                    <a 
+                      href={`/${lang === 'en' ? '' : lang}/blog/${post.slug}`}
+                      class="text-primary-600 dark:text-primary-400 font-medium hover:underline"
+                    >
+                      {getTranslation('blog.readMore', lang)} →
+                    </a>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="py-16 bg-white dark:bg-gray-800">
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+                {getTranslation('home.about.title', lang)}
+              </h2>
+              <p class="text-lg text-gray-600 dark:text-gray-300 mb-6">
+                {getTranslation('home.about.description', lang)}
+              </p>
+              <a 
+                href={`/${lang === 'en' ? '' : lang}/about`}
+                class="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+              >
+                {getTranslation('home.about.readMore', lang)}
+              </a>
+            </div>
+            <div class="text-center">
+              <div class="w-64 h-64 mx-auto bg-gradient-to-br from-primary-400 to-secondary-500 rounded-full flex items-center justify-center">
+                <svg class="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="py-16 bg-gray-100 dark:bg-gray-700">
+      <div class="container mx-auto px-4">
+        <div class="max-w-2xl mx-auto text-center">
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            {getTranslation('home.newsletter.title', lang)}
+          </h2>
+          <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
+            {getTranslation('home.newsletter.description', lang)}
+          </p>
+          <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <input 
+              type="email" 
+              placeholder={getTranslation('home.newsletter.placeholder', lang)}
+              class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              required
+            />
+            <button 
+              type="submit"
+              class="px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              {getTranslation('home.newsletter.subscribe', lang)}
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <Footer currentLang={lang} />
+  </div>
+</BaseLayout>
+
+<script>
+  // Newsletter form handling
+  const newsletterForm = document.querySelector('form');
+  
+  newsletterForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const emailInput = newsletterForm.querySelector('input[type="email"]') as HTMLInputElement;
+    const email = emailInput.value;
+    
+    if (!email) return;
+    
+    try {
+      // Here you would typically send the email to your backend
+      console.log('Newsletter subscription:', email);
+      
+      // Show success message
+      alert('Successfully subscribed!');
+      emailInput.value = '';
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      alert('Something went wrong. Please try again.');
+    }
+  });
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style> 

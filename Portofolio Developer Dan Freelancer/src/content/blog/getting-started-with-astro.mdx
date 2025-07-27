@@ -1,0 +1,223 @@
+---
+title: "Getting Started with Astro: A Complete Guide"
+description: "Learn how to build fast, modern websites with Astro. This comprehensive guide covers everything from installation to deployment."
+excerpt: "Astro is a modern static site generator that allows you to build faster websites with less JavaScript. In this guide, we'll explore how to get started with Astro and build your first project."
+pubDate: 2024-07-27
+categories: ["Web Development", "Astro", "Tutorial"]
+tags: ["astro", "web-development", "static-sites", "performance"]
+author: "Your Name"
+readingTime: "8 min read"
+featured: true
+---
+
+# Getting Started with Astro: A Complete Guide
+
+Astro is a modern static site generator that allows you to build faster websites with less JavaScript. In this comprehensive guide, we'll explore how to get started with Astro and build your first project.
+
+## What is Astro?
+
+Astro is a web framework designed for content-focused websites. It provides:
+
+- **Zero JavaScript by default** - Only send JavaScript when needed
+- **Component Islands** - Mix static and interactive components
+- **Multiple framework support** - Use React, Vue, Svelte, and more
+- **Built-in performance optimizations** - Automatic image optimization, CSS optimization, and more
+
+## Installation
+
+Getting started with Astro is straightforward. You can create a new project using npm, yarn, or pnpm:
+
+```bash
+# Using npm
+npm create astro@latest
+
+# Using yarn
+yarn create astro
+
+# Using pnpm
+pnpm create astro@latest
+```
+
+## Project Structure
+
+A typical Astro project has the following structure:
+
+```
+my-astro-project/
+├── public/
+├── src/
+│   ├── components/
+│   ├── layouts/
+│   └── pages/
+├── astro.config.mjs
+└── package.json
+```
+
+## Creating Your First Page
+
+Let's create a simple "Hello World" page:
+
+```astro
+---
+// This is the frontmatter section
+const pageTitle = "Hello World";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <h1>{pageTitle}</h1>
+    <p>Welcome to Astro!</p>
+  </body>
+</html>
+```
+
+## Using Components
+
+Astro components are similar to other frameworks but with some key differences:
+
+```astro
+---
+// src/components/Header.astro
+const { title } = Astro.props;
+---
+
+<header>
+  <h1>{title}</h1>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/blog">Blog</a>
+  </nav>
+</header>
+```
+
+## Layouts
+
+Layouts help you create consistent page structures:
+
+```astro
+---
+// src/layouts/Layout.astro
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Default description" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+```
+
+## Styling
+
+Astro supports multiple styling approaches:
+
+### CSS Modules
+
+```astro
+---
+// styles.module.css
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+---
+
+<div class={styles.container}>
+  <h1>Styled with CSS Modules</h1>
+</div>
+```
+
+### Tailwind CSS
+
+```astro
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-900">
+    Styled with Tailwind CSS
+  </h1>
+</div>
+```
+
+## Data Fetching
+
+Astro makes it easy to fetch data at build time:
+
+```astro
+---
+// Fetch data at build time
+const posts = await Astro.glob('./posts/*.md');
+const sortedPosts = posts.sort((a, b) => 
+  new Date(b.frontmatter.date) - new Date(a.frontmatter.date)
+);
+---
+
+<ul>
+  {sortedPosts.map((post) => (
+    <li>
+      <a href={post.url}>{post.frontmatter.title}</a>
+    </li>
+  ))}
+</ul>
+```
+
+## Deployment
+
+Astro sites can be deployed to any static hosting service:
+
+### Netlify
+
+```bash
+npm run build
+# Deploy the dist/ folder to Netlify
+```
+
+### Vercel
+
+```bash
+npm run build
+# Deploy the dist/ folder to Vercel
+```
+
+### GitHub Pages
+
+```bash
+npm run build
+# Push the dist/ folder to GitHub Pages
+```
+
+## Performance Benefits
+
+Astro's zero-JavaScript approach provides significant performance benefits:
+
+- **Faster page loads** - No JavaScript required for static content
+- **Better SEO** - Search engines can easily crawl your content
+- **Improved accessibility** - Works without JavaScript
+- **Lower bandwidth usage** - Smaller bundle sizes
+
+## Conclusion
+
+Astro is an excellent choice for content-focused websites. Its zero-JavaScript approach, component islands, and built-in optimizations make it perfect for blogs, documentation sites, and marketing pages.
+
+To learn more, check out the [official Astro documentation](https://docs.astro.build).
+
+---
+
+*This post was written as part of our series on modern web development tools. Stay tuned for more tutorials and guides!* 

@@ -1,317 +1,287 @@
-# 🚀 Astro Personal Blog Theme - Complete Demo
+# Astro Personal Blog Theme
 
-**The most comprehensive Astro blog theme with 58 features** - SEO optimized, performance focused, accessibility compliant, and ready for production deployment.
+A modern, responsive personal blog theme built with Astro and Tailwind CSS. Perfect for developers, writers, and content creators who want a beautiful, fast, and customizable blog.
 
-## 🌟 Live Demo
+## ✨ Features
 
-- **🌐 Main Demo:** [https://astro-blog-theme-demo.pages.dev](https://astro-blog-theme-demo.pages.dev)
-- **📊 Feature Showcase:** [https://astro-blog-theme-demo.pages.dev/showcase](https://astro-blog-theme-demo.pages.dev/showcase)
-- **📈 Theme Comparison:** [https://astro-blog-theme-demo.pages.dev/comparison](https://astro-blog-theme-demo.pages.dev/comparison)
-- **🎨 Layout Demos:** [https://astro-blog-theme-demo.pages.dev/layouts](https://astro-blog-theme-demo.pages.dev/layouts)
-
-## ✨ Features Overview
-
-### 🚀 Core Features (6)
-- ✅ **Responsive Design** - Mobile-first, all screen sizes
-- ✅ **Dark Mode** - Toggle dark/light mode
-- ✅ **SEO Optimization** - Meta tags, sitemap, RSS
-- ✅ **Content Collections** - Type-safe content management
-- ✅ **MDX Support** - Enhanced markdown with components
-- ✅ **Tailwind CSS** - Utility-first styling
-
-### 🎨 Layout Options (4)
-- ✅ **Classic Layout** - Traditional blog style
-- ✅ **Magazine Layout** - Grid-based magazine style
-- ✅ **Portfolio Layout** - Project showcase style
-- ✅ **Minimalist Layout** - Clean, minimal design
-
-### 📝 Advanced Content Features (6)
-- ✅ **Search Functionality** - Full-text search
-- ✅ **Reading Progress Bar** - Visual progress indicator
-- ✅ **Table of Contents** - Auto-generated TOC
-- ✅ **Code Syntax Highlighting** - Syntax highlighting + copy
-- ✅ **Image Gallery** - Masonry layout + lightbox
-- ✅ **Video Embeds** - YouTube, Vimeo, custom videos
-
-### 🎯 SEO & Performance Features (6)
-- ✅ **Advanced SEO** - Comprehensive meta tags
-- ✅ **Performance Monitoring** - Core Web Vitals tracking
-- ✅ **Image Optimization** - WebP support + lazy loading
-- ✅ **Service Worker** - Offline support + caching
-- ✅ **Analytics Integration** - Google Analytics + privacy
-- ✅ **Accessibility Features** - WCAG 2.1 AA compliance
+- **Modern Design**: Clean, professional design with dark mode support
+- **Responsive**: Fully responsive design that works on all devices
+- **Fast Performance**: Built with Astro for optimal performance
+- **SEO Optimized**: Built-in SEO features and meta tags
+- **Content Collections**: Easy blog post management with Astro's content collections
+- **Search & Filter**: Built-in search and tag filtering for blog posts
+- **Social Sharing**: Easy social media sharing for blog posts
+- **Newsletter Signup**: Newsletter subscription form
+- **Reading Time**: Automatic reading time calculation
+- **Syntax Highlighting**: Beautiful code syntax highlighting
+- **RSS Feed**: Automatic RSS feed generation
+- **Sitemap**: Automatic sitemap generation
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+
+
+- Node.js 18+ 
 - npm or yarn
 
 ### Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/astro-blog-theme.git
-cd astro-blog-theme
+1. **Clone or download this theme**
+   ```bash
+   git clone <repository-url>
+   cd astro-personal-blog-theme
+   ```
 
-# Install dependencies
-npm install
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-# Start development server
-npm run dev
-```
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-### Build for Production
-
-```bash
-# Build the project
-npm run build
-
-# Preview the build
-npm run preview
-```
-
-## 🌐 Deployment
-
-### Option 1: Cloudflare Pages (Recommended)
-
-```bash
-# Install Wrangler CLI
-npm install -g wrangler
-
-# Login to Cloudflare
-wrangler login
-
-# Deploy
-npm run deploy:cloudflare
-```
-
-**Manual Deployment:**
-1. Go to [Cloudflare Pages](https://pages.cloudflare.com/)
-2. Connect your GitHub repository
-3. Set build command: `npm run build`
-4. Set output directory: `dist`
-5. Deploy!
-
-### Option 2: Netlify
-
-```bash
-# Install Netlify CLI
-npm install -g netlify-cli
-
-# Login to Netlify
-netlify login
-
-# Deploy
-npm run deploy:netlify
-```
-
-**Manual Deployment:**
-1. Go to [Netlify](https://netlify.com/)
-2. Drag and drop the `dist` folder
-3. Or connect your GitHub repository
-4. Set build command: `npm run build`
-5. Set publish directory: `dist`
-
-### Option 3: Vercel
-
-```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Login to Vercel
-vercel login
-
-# Deploy
-npm run deploy:vercel
-```
-
-**Manual Deployment:**
-1. Go to [Vercel](https://vercel.com/)
-2. Import your GitHub repository
-3. Vercel will auto-detect Astro
-4. Deploy!
-
-## 📊 Performance Metrics
-
-| Metric | Target | Actual |
-|--------|--------|--------|
-| **Lighthouse Score** | 95+ | 98 |
-| **LCP** | ≤ 2.5s | 1.2s |
-| **FID** | ≤ 100ms | 45ms |
-| **CLS** | ≤ 0.1 | 0.02 |
-| **Build Time** | < 30s | 25s |
-| **Bundle Size** | Optimized | 14KB |
-
-## 🎯 SEO Features
-
-- ✅ **Automatic Sitemap** - Generated at `/sitemap-index.xml`
-- ✅ **Robots.txt** - SEO-friendly crawling
-- ✅ **Meta Tags** - Open Graph, Twitter Cards
-- ✅ **Structured Data** - JSON-LD markup
-- ✅ **Canonical URLs** - Duplicate content prevention
-- ✅ **Performance Optimization** - Core Web Vitals ready
-
-## 🔧 Configuration
-
-### Environment Variables
-
-```bash
-# Analytics (Optional)
-GA_ID=G-XXXXXXXXXX
-GTM_ID=GTM-XXXXXXXX
-
-# Site Configuration
-SITE_URL=https://your-domain.com
-SITE_TITLE=Your Blog Title
-SITE_DESCRIPTION=Your blog description
-```
-
-### Customization
-
-1. **Update Site Info** in `astro.config.mjs`
-2. **Modify Colors** in `tailwind.config.mjs`
-3. **Add Content** in `src/content/blog/`
-4. **Customize Layouts** in `src/layouts/`
+4. **Open your browser**
+   Navigate to `http://localhost:4321`
 
 ## 📁 Project Structure
 
 ```
+astro-personal-blog-theme/
 ├── src/
 │   ├── components/          # Reusable components
-│   ├── content/            # MDX blog posts
+│   │   ├── Header.astro    # Navigation header
+│   │   └── Footer.astro    # Site footer
+│   ├── content/
+│   │   ├── blog/           # Blog posts (markdown)
+│   │   └── config.ts       # Content collection config
 │   ├── layouts/            # Page layouts
+│   │   ├── BaseLayout.astro
+│   │   └── BlogPost.astro
 │   └── pages/              # Astro pages
+│       ├── index.astro     # Homepage
+│       ├── about.astro     # About page
+│       ├── contact.astro   # Contact page
+│       └── blog/           # Blog pages
 ├── public/                 # Static assets
-├── dist/                   # Build output
 ├── astro.config.mjs        # Astro configuration
-├── tailwind.config.mjs     # Tailwind configuration
-├── package.json            # Dependencies
-├── netlify.toml           # Netlify configuration
-├── vercel.json            # Vercel configuration
-└── wrangler.toml          # Cloudflare configuration
+├── tailwind.config.mjs     # Tailwind CSS configuration
+└── package.json
 ```
 
-## 🎨 Customization Guide
+## 🎨 Customization
 
-### Adding New Content
+### Colors
 
-```bash
-# Create new blog post
-touch src/content/blog/your-post.md
-```
+The theme uses a custom color palette defined in `tailwind.config.mjs`. You can customize the colors by modifying the `primary` and `secondary` color objects:
 
-### Customizing Styles
-
-```css
-/* Add custom styles in src/styles/global.css */
-@layer components {
-  .custom-button {
-    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
-  }
-}
-```
-
-### Adding New Components
-
-```astro
----
-// src/components/YourComponent.astro
-export interface Props {
-  title: string;
-}
-
-const { title } = Astro.props;
----
-
-<div class="your-component">
-  <h2>{title}</h2>
-</div>
-```
-
-## 📈 Analytics & Monitoring
-
-### Built-in Analytics
-- ✅ **Google Analytics 4** - Page views, events
-- ✅ **Performance Monitoring** - Core Web Vitals
-- ✅ **Error Tracking** - JavaScript errors
-- ✅ **User Behavior** - Click tracking, scroll depth
-
-### Custom Events
 ```javascript
-// Track custom events
-window.analytics.trackEvent('button_click', {
-  button: 'subscribe',
-  page: 'homepage'
+colors: {
+  primary: {
+    50: '#f0f9ff',
+    100: '#e0f2fe',
+    // ... more shades
+    900: '#0c4a6e',
+  },
+  secondary: {
+    50: '#fdf4ff',
+    100: '#fae8ff',
+    // ... more shades
+    900: '#701a75',
+  },
+}
+```
+
+### Typography
+
+The theme uses Inter for body text, Merriweather for headings, and JetBrains Mono for code. You can change these in `tailwind.config.mjs`:
+
+```javascript
+fontFamily: {
+  sans: ['Inter', 'system-ui', 'sans-serif'],
+  serif: ['Merriweather', 'Georgia', 'serif'],
+  mono: ['JetBrains Mono', 'monospace'],
+}
+```
+
+### Site Information
+
+Update the following files with your information:
+
+- `src/components/Header.astro` - Site title and navigation
+- `src/components/Footer.astro` - Social links and contact info
+- `src/pages/about.astro` - Personal information
+- `src/pages/contact.astro` - Contact details
+- `astro.config.mjs` - Site URL and meta information
+
+### Blog Posts
+
+Add new blog posts by creating markdown files in `src/content/blog/`. Each post should have frontmatter with:
+
+```markdown
+---
+title: "Your Post Title"
+description: "A brief description of your post"
+pubDate: 2024-01-15
+heroImage: "https://example.com/image.jpg" # Optional
+tags: ["tag1", "tag2"]
+---
+
+# Your content here
+```
+
+## 📝 Content Management
+
+### Adding Blog Posts
+
+1. Create a new `.md` file in `src/content/blog/`
+2. Add frontmatter with required fields
+3. Write your content in Markdown
+4. The post will automatically appear on your blog
+
+### Content Collections
+
+The theme uses Astro's content collections for type-safe content management. The schema is defined in `src/content/config.ts`:
+
+```typescript
+const blog = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.date(),
+    updatedDate: z.date().optional(),
+    heroImage: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+  }),
 });
 ```
 
-## ♿ Accessibility Features
+## 🔧 Configuration
 
-- ✅ **WCAG 2.1 AA Compliance**
-- ✅ **Keyboard Navigation**
-- ✅ **Screen Reader Support**
-- ✅ **Focus Management**
-- ✅ **ARIA Labels**
-- ✅ **Color Contrast**
+### Astro Configuration
 
-## 🔒 Security Features
+The main Astro configuration is in `astro.config.mjs`:
 
-- ✅ **Security Headers**
-- ✅ **Content Security Policy**
-- ✅ **XSS Protection**
-- ✅ **CSRF Protection**
-- ✅ **HTTPS Enforcement**
+```javascript
+export default defineConfig({
+  site: 'https://yourdomain.com',
+  integrations: [
+    mdx(),
+    sitemap(),
+    tailwind(),
+  ],
+  markdown: {
+    shikiConfig: {
+      theme: 'github-dark',
+      wrap: true
+    }
+  }
+});
+```
 
-## 📱 PWA Features
+### Tailwind Configuration
 
-- ✅ **Service Worker** - Offline support
-- ✅ **Web App Manifest** - Install as app
-- ✅ **Push Notifications** - Real-time updates
-- ✅ **Background Sync** - Data synchronization
+Customize the design system in `tailwind.config.mjs`:
 
-## 🚀 Performance Features
+```javascript
+module.exports = {
+  content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  theme: {
+    extend: {
+      colors: { /* your colors */ },
+      fontFamily: { /* your fonts */ },
+      typography: { /* prose styles */ },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
+}
+```
 
-- ✅ **Image Optimization** - WebP, lazy loading
-- ✅ **Code Splitting** - Automatic chunking
-- ✅ **Minification** - CSS/JS optimization
-- ✅ **Caching Strategy** - Long-term caching
-- ✅ **CDN Ready** - Global distribution
+## 🚀 Deployment
 
-## 📚 Documentation
+### Vercel (Recommended)
 
-- 📖 [Layout Options](./LAYOUTS.md)
-- 📖 [Advanced Content Features](./ADVANCED_CONTENT.md)
-- 📖 [SEO & Performance](./SEO_PERFORMANCE.md)
-- 📖 [Deployment Guide](./DEPLOYMENT.md)
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Deploy automatically
+
+### Netlify
+
+1. Push your code to GitHub
+2. Connect your repository to Netlify
+3. Set build command: `npm run build`
+4. Set publish directory: `dist`
+
+### GitHub Pages
+
+1. Update `astro.config.mjs`:
+   ```javascript
+   export default defineConfig({
+     site: 'https://yourusername.github.io',
+     base: '/your-repo-name',
+   });
+   ```
+
+2. Set up GitHub Actions for automatic deployment
+
+## 📦 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run astro` - Run Astro CLI commands
+
+## 🎯 Features in Detail
+
+### Dark Mode
+
+The theme includes a dark mode toggle that persists user preference in localStorage.
+
+### Search & Filter
+
+The blog page includes:
+- Real-time search through post titles and content
+- Tag-based filtering
+- Responsive design for mobile and desktop
+
+### Social Sharing
+
+Blog posts include social sharing buttons for Twitter and LinkedIn.
+
+### Newsletter Signup
+
+The homepage and footer include newsletter signup forms (backend integration required).
+
+### Reading Time
+
+Automatic reading time calculation for blog posts using the `reading-time` package.
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+4. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This theme is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 🙏 Acknowledgments
 
-- 📧 **Email:** support@yourdomain.com
-- 💬 **Discord:** [Join our community](https://discord.gg/yourcommunity)
-- 📖 **Documentation:** [Read the docs](https://docs.yourdomain.com)
-- 🐛 **Issues:** [Report bugs](https://github.com/yourusername/astro-blog-theme/issues)
+- [Astro](https://astro.build) - The amazing static site generator
+- [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS framework
+- [Unsplash](https://unsplash.com) - Beautiful stock photos
+- [Heroicons](https://heroicons.com) - Beautiful icons
 
-## 🎉 Acknowledgments
+## 📞 Support
 
-- **Astro Team** - For the amazing framework
-- **Tailwind CSS** - For the utility-first CSS
-- **Community** - For feedback and contributions
+If you have any questions or need help customizing this theme, please open an issue on GitHub.
 
 ---
 
-**Ready to build the most comprehensive blog?** 🚀
-
-[View Live Demo](https://astro-blog-theme-demo.pages.dev) | [Get Started](./DEPLOYMENT.md) | [View Features](./showcase) 
+**Happy blogging! 🚀** 

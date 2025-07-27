@@ -151,16 +151,16 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"blog": {
-"first-post.md": {
-	id: "first-post.md";
-  slug: "first-post";
+"getting-started-with-astro.md": {
+	id: "getting-started-with-astro.md";
+  slug: "getting-started-with-astro";
   body: string;
   collection: "blog";
   data: InferEntrySchema<"blog">
 } & { render(): Render[".md"] };
-"getting-started-with-astro.md": {
-	id: "getting-started-with-astro.md";
-  slug: "getting-started-with-astro";
+"why-i-love-tailwind-css.md": {
+	id: "why-i-love-tailwind-css.md";
+  slug: "why-i-love-tailwind-css";
   body: string;
   collection: "blog";
   data: InferEntrySchema<"blog">

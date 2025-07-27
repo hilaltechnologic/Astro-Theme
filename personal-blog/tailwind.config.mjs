@@ -16,54 +16,55 @@ export default {
           800: '#075985',
           900: '#0c4a6e',
         },
-        gray: {
-          50: '#f9fafb',
-          100: '#f3f4f6',
-          200: '#e5e7eb',
-          300: '#d1d5db',
-          400: '#9ca3af',
-          500: '#6b7280',
-          600: '#4b5563',
-          700: '#374151',
-          800: '#1f2937',
-          900: '#111827',
-        }
+        secondary: {
+          50: '#fdf4ff',
+          100: '#fae8ff',
+          200: '#f5d0fe',
+          300: '#f0abfc',
+          400: '#e879f9',
+          500: '#d946ef',
+          600: '#c026d3',
+          700: '#a21caf',
+          800: '#86198f',
+          900: '#701a75',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         serif: ['Merriweather', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       typography: {
         DEFAULT: {
           css: {
-            maxWidth: '65ch',
-            color: 'inherit',
+            maxWidth: 'none',
+            color: '#374151',
             a: {
               color: '#0ea5e9',
               '&:hover': {
                 color: '#0284c7',
               },
             },
-            b: {
-              color: 'inherit',
-            },
-            strong: {
-              color: 'inherit',
-            },
-            code: {
-              color: 'inherit',
-            },
             h1: {
-              color: 'inherit',
+              color: '#111827',
             },
             h2: {
-              color: 'inherit',
+              color: '#111827',
             },
             h3: {
-              color: 'inherit',
+              color: '#111827',
             },
             h4: {
-              color: 'inherit',
+              color: '#111827',
+            },
+            code: {
+              color: '#d946ef',
+            },
+            'code::before': {
+              content: '""',
+            },
+            'code::after': {
+              content: '""',
             },
           },
         },

@@ -1,0 +1,166 @@
+---
+import { languages, type Language } from '../i18n/config';
+import { getTranslation } from '../i18n/index';
+
+interface Props {
+  currentLang: Language;
+  url: URL;
+}
+
+const { currentLang, url } = Astro.props;
+---
+
+<div class="relative group">
+  <button
+    id="language-selector"
+    class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+    aria-haspopup="true"
+    aria-expanded="false"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+    </svg>
+    <span>{languages[currentLang]}</span>
+    <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+
+  <div
+    id="language-dropdown"
+    class="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+  >
+    <div class="py-1">
+      {Object.entries(languages).map(([code, name]) => {
+        const isActive = code === currentLang;
+        const pathname = url.pathname;
+        const segments = pathname.split('/');
+        const currentLangSegment = segments[1];
+        
+        let newPathname = pathname;
+        if (supportedLanguages.includes(currentLangSegment)) {
+          // Replace language in URL
+          segments[1] = code;
+          newPathname = segments.join('/');
+        } else {
+          // Add language to URL
+          newPathname = `/${code}${pathname}`;
+        }
+        
+        return (
+          <a
+            href={newPathname}
+            class={`block px-4 py-2 text-sm transition-colors ${
+              isActive
+                ? 'bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+            data-lang={code}
+          >
+            <div class="flex items-center justify-between">
+              <span>{name}</span>
+              {isActive && (
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+              )}
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
+<script>
+  class LanguageSelector {
+    constructor() {
+      this.selector = document.getElementById('language-selector');
+      this.dropdown = document.getElementById('language-dropdown');
+      this.init();
+    }
+
+    init() {
+      this.bindEvents();
+    }
+
+    bindEvents() {
+      // Toggle dropdown on click
+      this.selector?.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.toggleDropdown();
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!this.selector?.contains(e.target as Node) && !this.dropdown?.contains(e.target as Node)) {
+          this.closeDropdown();
+        }
+      });
+
+      // Handle keyboard navigation
+      this.selector?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.toggleDropdown();
+        }
+      });
+
+      // Handle language selection
+      this.dropdown?.addEventListener('click', (e) => {
+        const link = (e.target as HTMLElement).closest('a');
+        if (link) {
+          const lang = link.dataset.lang;
+          if (lang) {
+            this.selectLanguage(lang);
+          }
+        }
+      });
+    }
+
+    toggleDropdown() {
+      const isExpanded = this.selector?.getAttribute('aria-expanded') === 'true';
+      this.selector?.setAttribute('aria-expanded', (!isExpanded).toString());
+      
+      if (isExpanded) {
+        this.closeDropdown();
+      } else {
+        this.openDropdown();
+      }
+    }
+
+    openDropdown() {
+      this.dropdown?.classList.remove('opacity-0', 'invisible');
+      this.dropdown?.classList.add('opacity-100', 'visible');
+    }
+
+    closeDropdown() {
+      this.dropdown?.classList.add('opacity-0', 'invisible');
+      this.dropdown?.classList.remove('opacity-100', 'visible');
+      this.selector?.setAttribute('aria-expanded', 'false');
+    }
+
+    selectLanguage(lang: string) {
+      // Store language preference
+      localStorage.setItem('preferred-language', lang);
+      
+      // Update UI to show loading state
+      this.selector?.classList.add('opacity-50');
+      this.selector?.setAttribute('disabled', 'true');
+      
+      // Close dropdown
+      this.closeDropdown();
+      
+      // Navigate to new URL (handled by the link)
+    }
+  }
+
+  // Initialize language selector
+  new LanguageSelector();
+</script>
+
+<style>
+  .group:hover .group-hover\:rotate-180 {
+    transform: rotate(180deg);
+  }
+</style> 
