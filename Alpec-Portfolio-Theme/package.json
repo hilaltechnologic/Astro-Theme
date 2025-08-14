@@ -1,0 +1,33 @@
+{
+  "name": "alpec-portfolio-theme",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Modern and futuristic portfolio theme built with Astro",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^4.0.0",
+    "@astrojs/tailwind": "^5.0.0",
+    "tailwindcss": "^3.3.0",
+    "@tailwindcss/typography": "^0.5.10"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "astro",
+    "portfolio",
+    "theme",
+    "modern",
+    "futuristic",
+    "responsive"
+  ],
+  "author": "Alpec Theme",
+  "license": "MIT"
+}

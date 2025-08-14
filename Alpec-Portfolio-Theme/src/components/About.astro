@@ -1,0 +1,243 @@
+---
+// About component with interactive timeline and modern design
+---
+
+<section id="about" class="py-20 relative overflow-hidden">
+  <div class="container mx-auto px-6">
+    <!-- Section Header -->
+    <div class="text-center mb-16 animate-on-scroll">
+      <h2 class="text-4xl md:text-5xl font-bold text-gradient mb-6">About Me</h2>
+      <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+        Passionate full-stack developer with a love for creating innovative digital solutions. 
+        I combine technical expertise with creative problem-solving to build exceptional user experiences.
+      </p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <!-- Left Column - Personal Info -->
+      <div class="animate-on-scroll">
+        <div class="glass-effect rounded-2xl p-8 cyber-border">
+          <div class="flex items-center mb-6">
+            <div class="w-20 h-20 bg-gradient-to-r from-accent-cyan to-accent-purple rounded-full flex items-center justify-center mr-6">
+              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-white mb-2">Alex Parker</h3>
+              <p class="text-accent-cyan font-medium">Full-Stack Developer</p>
+            </div>
+          </div>
+          
+          <p class="text-gray-300 mb-6 leading-relaxed">
+            With over 3 years of experience in web development, I specialize in creating modern, 
+            scalable applications using cutting-edge technologies. My passion lies in transforming 
+            complex problems into elegant, user-friendly solutions.
+          </p>
+          
+          <!-- Personal Details -->
+          <div class="space-y-4">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-accent-green mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span class="text-gray-300">San Francisco, CA</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-accent-purple mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              <span class="text-gray-300">alex@example.com</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-accent-cyan mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
+              </svg>
+              <span class="text-gray-300">Available for freelance</span>
+            </div>
+          </div>
+
+          <!-- Download CV Button -->
+          <div class="mt-8">
+            <a href="#" class="inline-flex items-center px-6 py-3 cyber-border rounded-lg text-white hover:bg-accent-cyan/10 transition-all duration-300 glow-effect">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Download CV
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Timeline -->
+      <div class="animate-on-scroll">
+        <h3 class="text-2xl font-bold text-white mb-8 flex items-center">
+          <svg class="w-6 h-6 text-accent-cyan mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          My Journey
+        </h3>
+        
+        <!-- Timeline -->
+        <div class="relative">
+          <!-- Timeline Line -->
+          <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-accent-cyan via-accent-purple to-accent-green"></div>
+          
+          <!-- Timeline Items -->
+          <div class="space-y-8">
+            <!-- Timeline Item 1 -->
+            <div class="relative flex items-start">
+              <div class="absolute left-0 w-8 h-8 bg-gradient-to-r from-accent-cyan to-accent-purple rounded-full flex items-center justify-center z-10">
+                <div class="w-3 h-3 bg-white rounded-full"></div>
+              </div>
+              <div class="ml-12 glass-effect rounded-lg p-6 cyber-border">
+                <div class="flex justify-between items-start mb-2">
+                  <h4 class="text-lg font-semibold text-white">Senior Full-Stack Developer</h4>
+                  <span class="text-accent-cyan text-sm font-medium">2022 - Present</span>
+                </div>
+                <p class="text-accent-green font-medium mb-2">TechCorp Solutions</p>
+                <p class="text-gray-300 text-sm">
+                  Leading development of enterprise web applications using React, Node.js, and cloud technologies. 
+                  Mentoring junior developers and architecting scalable solutions.
+                </p>
+              </div>
+            </div>
+
+            <!-- Timeline Item 2 -->
+            <div class="relative flex items-start">
+              <div class="absolute left-0 w-8 h-8 bg-gradient-to-r from-accent-purple to-accent-green rounded-full flex items-center justify-center z-10">
+                <div class="w-3 h-3 bg-white rounded-full"></div>
+              </div>
+              <div class="ml-12 glass-effect rounded-lg p-6 cyber-border">
+                <div class="flex justify-between items-start mb-2">
+                  <h4 class="text-lg font-semibold text-white">Frontend Developer</h4>
+                  <span class="text-accent-cyan text-sm font-medium">2021 - 2022</span>
+                </div>
+                <p class="text-accent-green font-medium mb-2">Digital Agency Pro</p>
+                <p class="text-gray-300 text-sm">
+                  Developed responsive web applications and mobile-first designs. 
+                  Collaborated with design teams to create pixel-perfect user interfaces.
+                </p>
+              </div>
+            </div>
+
+            <!-- Timeline Item 3 -->
+            <div class="relative flex items-start">
+              <div class="absolute left-0 w-8 h-8 bg-gradient-to-r from-accent-green to-accent-pink rounded-full flex items-center justify-center z-10">
+                <div class="w-3 h-3 bg-white rounded-full"></div>
+              </div>
+              <div class="ml-12 glass-effect rounded-lg p-6 cyber-border">
+                <div class="flex justify-between items-start mb-2">
+                  <h4 class="text-lg font-semibold text-white">Junior Web Developer</h4>
+                  <span class="text-accent-cyan text-sm font-medium">2020 - 2021</span>
+                </div>
+                <p class="text-accent-green font-medium mb-2">StartupHub Inc</p>
+                <p class="text-gray-300 text-sm">
+                  Started my professional journey building dynamic websites and learning modern development practices. 
+                  Gained experience in full-stack development and agile methodologies.
+                </p>
+              </div>
+            </div>
+
+            <!-- Timeline Item 4 -->
+            <div class="relative flex items-start">
+              <div class="absolute left-0 w-8 h-8 bg-gradient-to-r from-accent-pink to-accent-cyan rounded-full flex items-center justify-center z-10">
+                <div class="w-3 h-3 bg-white rounded-full"></div>
+              </div>
+              <div class="ml-12 glass-effect rounded-lg p-6 cyber-border">
+                <div class="flex justify-between items-start mb-2">
+                  <h4 class="text-lg font-semibold text-white">Computer Science Degree</h4>
+                  <span class="text-accent-cyan text-sm font-medium">2016 - 2020</span>
+                </div>
+                <p class="text-accent-green font-medium mb-2">University of California</p>
+                <p class="text-gray-300 text-sm">
+                  Bachelor's degree in Computer Science with focus on software engineering and web technologies. 
+                  Graduated with honors and completed several innovative projects.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="mt-20 animate-on-scroll">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="text-center glass-effect rounded-xl p-6 cyber-border">
+          <div class="text-3xl md:text-4xl font-bold text-gradient mb-2" data-count="50">0</div>
+          <p class="text-gray-300 text-sm">Projects Completed</p>
+        </div>
+        <div class="text-center glass-effect rounded-xl p-6 cyber-border">
+          <div class="text-3xl md:text-4xl font-bold text-gradient mb-2" data-count="25">0</div>
+          <p class="text-gray-300 text-sm">Happy Clients</p>
+        </div>
+        <div class="text-center glass-effect rounded-xl p-6 cyber-border">
+          <div class="text-3xl md:text-4xl font-bold text-gradient mb-2" data-count="3">0</div>
+          <p class="text-gray-300 text-sm">Years Experience</p>
+        </div>
+        <div class="text-center glass-effect rounded-xl p-6 cyber-border">
+          <div class="text-3xl md:text-4xl font-bold text-gradient mb-2" data-count="15">0</div>
+          <p class="text-gray-300 text-sm">Technologies</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Counter animation for stats
+  function animateCounters() {
+    const counters = document.querySelectorAll('[data-count]');
+    
+    counters.forEach(counter => {
+      const target = parseInt(counter.getAttribute('data-count') || '0');
+      const duration = 2000; // 2 seconds
+      const increment = target / (duration / 16); // 60fps
+      let current = 0;
+      
+      const updateCounter = () => {
+        current += increment;
+        if (current < target) {
+          counter.textContent = Math.floor(current).toString();
+          requestAnimationFrame(updateCounter);
+        } else {
+          counter.textContent = target.toString();
+        }
+      };
+      
+      // Start animation when element is visible
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            updateCounter();
+            observer.unobserve(entry.target);
+          }
+        });
+      });
+      
+      observer.observe(counter);
+    });
+  }
+  
+  // Initialize counter animation
+  document.addEventListener('DOMContentLoaded', animateCounters);
+</script>
+
+<style>
+  /* Timeline hover effects */
+  .timeline-item:hover .glass-effect {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(4px);
+    transition: all 0.3s ease;
+  }
+  
+  /* Stats animation */
+  [data-count] {
+    background: linear-gradient(45deg, var(--color-accent-cyan), var(--color-accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+</style>

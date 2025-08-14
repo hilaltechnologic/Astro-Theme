@@ -1,0 +1,225 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import { projects, categories, getProjectsByCategory } from '../data/projects';
+---
+
+<section id="projects" class="py-20 px-6 animate-on-scroll">
+  <div class="container mx-auto max-w-7xl">
+    <!-- Section Header -->
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold text-gradient mb-6">
+        Featured Projects
+      </h2>
+      <p class="text-gray-300 text-lg max-w-3xl mx-auto">
+        Explore my latest work showcasing modern web development, mobile applications, 
+        and creative digital solutions. Each project represents a unique challenge 
+        and innovative approach to problem-solving.
+      </p>
+    </div>
+
+    <!-- Project Filter -->
+    <div class="flex flex-wrap justify-center gap-4 mb-12">
+      {categories.map((category) => (
+        <button 
+          class="filter-btn px-6 py-2 rounded-full border border-gray-600/30 text-gray-300 hover:text-accent-cyan hover:border-accent-cyan/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50"
+          data-category={category}
+        >
+          {category}
+        </button>
+      ))}
+    </div>
+
+    <!-- Projects Grid -->
+    <div class="projects-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {projects.map((project) => (
+        <div class="project-item animate-on-scroll" data-category={project.category}>
+          <ProjectCard
+            title={project.title}
+            description={project.description}
+            image={project.image}
+            technologies={project.technologies}
+            liveUrl={project.liveUrl}
+            githubUrl={project.githubUrl}
+            category={project.category}
+            featured={project.featured}
+          />
+        </div>
+      ))}
+    </div>
+
+    <!-- Load More Button -->
+    <div class="text-center mt-12">
+      <button class="load-more-btn cyber-border px-8 py-3 rounded-lg text-white hover:bg-accent-cyan/10 transition-all duration-300 glow-effect">
+        Load More Projects
+      </button>
+    </div>
+
+    <!-- Project Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 pt-16 border-t border-gray-700/30">
+      <div class="text-center">
+        <div class="text-3xl font-bold text-gradient mb-2">15+</div>
+        <div class="text-gray-400 text-sm">Projects Completed</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-gradient-green mb-2">8+</div>
+        <div class="text-gray-400 text-sm">Technologies Mastered</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-gradient mb-2">3+</div>
+        <div class="text-gray-400 text-sm">Years Experience</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-gradient-green mb-2">100%</div>
+        <div class="text-gray-400 text-sm">Client Satisfaction</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Project filtering functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projectItems = document.querySelectorAll('.project-item');
+    
+    // Set initial active filter
+    const allButton = document.querySelector('[data-category="All"]');
+    if (allButton) {
+      allButton.classList.add('active');
+    }
+    
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const category = button.getAttribute('data-category');
+        
+        // Update active button
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        // Filter projects
+        projectItems.forEach(item => {
+          const element = item as HTMLElement;
+          const itemCategory = element.getAttribute('data-category');
+          
+          if (category === 'All' || itemCategory === category) {
+            element.style.display = 'block';
+            element.classList.add('animate-on-scroll');
+            // Trigger animation
+            setTimeout(() => {
+              element.classList.add('animate');
+            }, 100);
+          } else {
+            element.style.display = 'none';
+            element.classList.remove('animate');
+          }
+        });
+      });
+    });
+    
+    // Load more functionality
+    const loadMoreBtn = document.querySelector('.load-more-btn');
+    let visibleProjects = 6;
+    
+    // Initially show only first 6 projects
+    projectItems.forEach((item, index) => {
+      const element = item as HTMLElement;
+      if (index >= visibleProjects) {
+        element.style.display = 'none';
+      }
+    });
+    
+    loadMoreBtn?.addEventListener('click', () => {
+      const hiddenProjects = Array.from(projectItems).slice(visibleProjects, visibleProjects + 3);
+      
+      hiddenProjects.forEach((item, index) => {
+        const element = item as HTMLElement;
+        setTimeout(() => {
+          element.style.display = 'block';
+          element.classList.add('animate-on-scroll', 'animate');
+        }, index * 100);
+      });
+      
+      visibleProjects += 3;
+      
+      // Hide load more button if all projects are visible
+      if (visibleProjects >= projectItems.length) {
+        (loadMoreBtn as HTMLElement).style.display = 'none';
+      }
+    });
+    
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+        }
+      });
+    }, observerOptions);
+    
+    // Observe project items
+    projectItems.forEach(item => {
+      observer.observe(item);
+    });
+  });
+</script>
+
+<style>
+  .filter-btn.active {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.5);
+    color: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  }
+  
+  .projects-grid {
+    perspective: 1000px;
+  }
+  
+  .project-item {
+    opacity: 0;
+    transform: translateY(30px) rotateX(10deg);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .project-item.animate {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+  
+  .project-item:nth-child(even) {
+    transition-delay: 0.1s;
+  }
+  
+  .project-item:nth-child(3n) {
+    transition-delay: 0.2s;
+  }
+  
+  .load-more-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 255, 255, 0.2);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .projects-grid {
+      grid-template-columns: 1fr;
+      gap: 6rem;
+    }
+    
+    .filter-btn {
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .projects-grid {
+      gap: 4rem;
+    }
+  }
+</style>

@@ -1,0 +1,247 @@
+---
+import PerformanceMonitor from '../components/PerformanceMonitor.astro';
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  keywords?: string;
+  author?: string;
+  type?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+}
+
+const { 
+  title, 
+  description = "Modern and futuristic portfolio theme built with Astro. Showcasing cutting-edge web development, UI/UX design, and innovative digital solutions.",
+  image = "/og-image.jpg",
+  keywords = "portfolio, web developer, UI/UX designer, React, Node.js, TypeScript, Astro, modern design, futuristic theme",
+  author = "Alex Parker",
+  type = "website",
+  publishedTime,
+  modifiedTime
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const currentYear = new Date().getFullYear();
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    
+    <!-- Primary Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content={author} />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+    
+    <!-- Viewport and Mobile Optimization -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalURL} />
+    
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="msapplication-TileColor" content="#0f172a" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.url)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Alex Parker Portfolio" />
+    <meta property="og:locale" content="en_US" />
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={Astro.url} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, Astro.url)} />
+    <meta name="twitter:creator" content="@alexparker" />
+    <meta name="twitter:site" content="@alexparker" />
+    
+    <!-- LinkedIn -->
+    <meta property="og:image:alt" content={title} />
+    
+    <!-- Performance Optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/jetbrains-mono-var.woff2" as="font" type="font/woff2" crossorigin />
+    
+    <!-- Generator -->
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": author,
+      "url": Astro.site,
+      "image": new URL(image, Astro.url),
+      "sameAs": [
+        "https://github.com/alexparker",
+        "https://linkedin.com/in/alexparker",
+        "https://twitter.com/alexparker"
+      ],
+      "jobTitle": "Full-Stack Developer & UI/UX Designer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Freelance"
+      },
+      "knowsAbout": ["Web Development", "UI/UX Design", "React", "Node.js", "TypeScript", "Astro"],
+      "description": description
+    })} />
+    
+    <!-- Website Schema -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Alex Parker Portfolio",
+      "url": Astro.site,
+      "description": description,
+      "author": {
+        "@type": "Person",
+        "name": author
+      },
+      "inLanguage": "en-US",
+      "copyrightYear": currentYear,
+      "copyrightHolder": {
+        "@type": "Person",
+        "name": author
+      }
+    })} />
+  </head>
+  <body class="bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 text-white min-h-screen">
+    <!-- Performance Monitoring -->
+    <PerformanceMonitor />
+    <!-- Background Effects -->
+    <div class="fixed inset-0 cyber-grid opacity-20 pointer-events-none"></div>
+    <div class="fixed inset-0 bg-gradient-radial from-transparent via-transparent to-dark-900/50 pointer-events-none"></div>
+    
+    <!-- Floating Particles -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-1/4 left-1/4 w-2 h-2 bg-accent-cyan rounded-full opacity-60 animate-float"></div>
+      <div class="absolute top-3/4 right-1/4 w-1 h-1 bg-accent-purple rounded-full opacity-40 animate-float" style="animation-delay: 1s;"></div>
+      <div class="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-accent-green rounded-full opacity-50 animate-float" style="animation-delay: 2s;"></div>
+      <div class="absolute top-1/6 right-1/3 w-1 h-1 bg-accent-pink rounded-full opacity-30 animate-float" style="animation-delay: 3s;"></div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="relative z-10">
+      <slot />
+    </main>
+    
+    <!-- Scripts -->
+    <script>
+      // Smooth scroll animation observer
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+          }
+        });
+      }, observerOptions);
+      
+      // Observe all elements with animate-on-scroll class
+      document.addEventListener('DOMContentLoaded', () => {
+        const animateElements = document.querySelectorAll('.animate-on-scroll');
+        animateElements.forEach(el => observer.observe(el));
+      });
+      
+      // Cursor glow effect
+      document.addEventListener('mousemove', (e) => {
+        const cursor = document.querySelector('.cursor-glow') as HTMLElement;
+        if (cursor) {
+          cursor.style.left = e.clientX + 'px';
+          cursor.style.top = e.clientY + 'px';
+        }
+      });
+      
+      // Theme toggle functionality (for future use)
+      const toggleTheme = () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      };
+      
+      // Load saved theme
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+      }
+    </script>
+    
+    <!-- Cursor Glow Effect -->
+    <div class="cursor-glow fixed w-6 h-6 bg-accent-cyan/20 rounded-full pointer-events-none z-50 mix-blend-screen blur-sm transition-all duration-300 ease-out"></div>
+    
+    <style>
+      /* Custom cursor for desktop */
+      @media (min-width: 768px) {
+        * {
+          cursor: none;
+        }
+        
+        a, button, [role="button"] {
+          cursor: none;
+        }
+        
+        .cursor-glow {
+          transform: translate(-50%, -50%);
+        }
+        
+        a:hover ~ .cursor-glow,
+        button:hover ~ .cursor-glow,
+        [role="button"]:hover ~ .cursor-glow {
+          transform: translate(-50%, -50%) scale(2);
+          background: rgba(0, 255, 255, 0.4);
+        }
+      }
+      
+      @media (max-width: 767px) {
+        .cursor-glow {
+          display: none;
+        }
+        
+        * {
+          cursor: auto !important;
+        }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,276 @@
+---
+// Performance monitoring component
+---
+
+<script>
+  // Performance monitoring and analytics
+  class PerformanceMonitor {
+    private metrics: any = {};
+    
+    constructor() {
+      this.metrics = {};
+      this.init();
+    }
+    
+    init() {
+      // Wait for page to load completely
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.collectMetrics());
+      } else {
+        this.collectMetrics();
+      }
+      
+      // Monitor Core Web Vitals
+      this.observeWebVitals();
+      
+      // Monitor resource loading
+      this.observeResources();
+      
+      // Monitor user interactions
+      this.observeInteractions();
+    }
+    
+    collectMetrics() {
+      // Navigation Timing API
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      
+      if (navigation) {
+        this.metrics = {
+          // Page Load Metrics
+          domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+          loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
+          
+          // Network Metrics
+          dnsLookup: navigation.domainLookupEnd - navigation.domainLookupStart,
+          tcpConnection: navigation.connectEnd - navigation.connectStart,
+          serverResponse: navigation.responseEnd - navigation.requestStart,
+          
+          // Rendering Metrics
+          domProcessing: navigation.domComplete - navigation.domInteractive,
+          
+          // Total Page Load Time
+          totalLoadTime: navigation.loadEventEnd - navigation.fetchStart,
+          
+          // Time to First Byte
+          ttfb: navigation.responseStart - navigation.fetchStart,
+          
+          // First Contentful Paint (if available)
+          fcp: this.getFirstContentfulPaint(),
+          
+          // Largest Contentful Paint (if available)
+          lcp: this.getLargestContentfulPaint()
+        };
+        
+        // Log metrics to console in development
+        if (import.meta.env.DEV) {
+          console.group('🚀 Performance Metrics');
+          console.table(this.metrics);
+          console.groupEnd();
+        }
+        
+        // Send to analytics (replace with your analytics service)
+        this.sendToAnalytics();
+      }
+    }
+    
+    getFirstContentfulPaint() {
+      const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0];
+      return fcpEntry ? fcpEntry.startTime : null;
+    }
+    
+    getLargestContentfulPaint() {
+      return new Promise((resolve) => {
+        new PerformanceObserver((entryList) => {
+          const entries = entryList.getEntries();
+          const lastEntry = entries[entries.length - 1];
+          resolve(lastEntry.startTime);
+        }).observe({ entryTypes: ['largest-contentful-paint'] });
+      });
+    }
+    
+    observeWebVitals() {
+      // Cumulative Layout Shift (CLS)
+      let clsValue = 0;
+      new PerformanceObserver((entryList) => {
+        for (const entry of entryList.getEntries()) {
+          if (!(entry as any).hadRecentInput) {
+            clsValue += (entry as any).value;
+          }
+        }
+        this.metrics.cls = clsValue;
+      }).observe({ entryTypes: ['layout-shift'] });
+      
+      // First Input Delay (FID)
+      new PerformanceObserver((entryList) => {
+        for (const entry of entryList.getEntries()) {
+          this.metrics.fid = (entry as any).processingStart - entry.startTime;
+        }
+      }).observe({ entryTypes: ['first-input'] });
+    }
+    
+    observeResources() {
+      // Monitor resource loading performance
+      new PerformanceObserver((entryList) => {
+        for (const entry of entryList.getEntries()) {
+          const resource = entry as PerformanceResourceTiming;
+          
+          // Track slow resources
+          if (resource.duration > 1000) { // Resources taking more than 1 second
+            console.warn(`Slow resource detected: ${resource.name} (${resource.duration.toFixed(2)}ms)`);
+          }
+          
+          // Track failed resources
+          if (resource.transferSize === 0 && resource.decodedBodySize === 0) {
+            console.error(`Failed to load resource: ${resource.name}`);
+          }
+        }
+      }).observe({ entryTypes: ['resource'] });
+    }
+    
+    observeInteractions() {
+      // Track user interactions for performance impact
+      const interactionTypes = ['click', 'keydown', 'scroll'];
+      
+      interactionTypes.forEach(type => {
+        document.addEventListener(type, (event) => {
+          const startTime = performance.now();
+          
+          // Use requestIdleCallback to measure impact
+          requestIdleCallback(() => {
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            if (duration > 100) { // Interactions taking more than 100ms
+              console.warn(`Slow interaction detected: ${type} (${duration.toFixed(2)}ms)`);
+            }
+          });
+        }, { passive: true });
+      });
+    }
+    
+    sendToAnalytics() {
+      // Example: Send to Google Analytics 4
+      if (typeof (window as any).gtag !== 'undefined') {
+        (window as any).gtag('event', 'page_performance', {
+          custom_parameter_1: this.metrics.totalLoadTime,
+          custom_parameter_2: this.metrics.fcp,
+          custom_parameter_3: this.metrics.lcp
+        });
+      }
+      
+      // Example: Send to custom analytics endpoint
+      if (import.meta.env.PROD) {
+        fetch('/api/analytics/performance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            metrics: this.metrics,
+            timestamp: new Date().toISOString()
+          })
+        }).catch(error => {
+          console.warn('Failed to send performance metrics:', error);
+        });
+      }
+    }
+    
+    // Public method to get current metrics
+    getMetrics() {
+      return this.metrics;
+    }
+    
+    // Method to track custom performance marks
+    mark(name: string) {
+      performance.mark(name);
+    }
+    
+    // Method to measure between marks
+    measure(name: string, startMark: string, endMark?: string) {
+      performance.measure(name, startMark, endMark);
+      const measure = performance.getEntriesByName(name, 'measure')[0];
+      
+      if (import.meta.env.DEV) {
+        console.log(`📊 ${name}: ${measure.duration.toFixed(2)}ms`);
+      }
+      
+      return measure.duration;
+    }
+  }
+  
+  // Initialize performance monitoring
+  const performanceMonitor = new PerformanceMonitor();
+  
+  // Make it globally available for debugging
+  (window as any).performanceMonitor = performanceMonitor;
+  
+  // Monitor page visibility changes
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      // Page is being hidden, good time to send final metrics
+      performanceMonitor.sendToAnalytics();
+    }
+  });
+  
+  // Monitor memory usage (if available)
+  if ('memory' in performance) {
+    setInterval(() => {
+      const memory = (performance as any).memory;
+      if (memory.usedJSHeapSize > memory.jsHeapSizeLimit * 0.9) {
+        console.warn('High memory usage detected:', {
+          used: (memory.usedJSHeapSize / 1048576).toFixed(2) + ' MB',
+          limit: (memory.jsHeapSizeLimit / 1048576).toFixed(2) + ' MB'
+        });
+      }
+    }, 30000); // Check every 30 seconds
+  }
+  
+  // Export for use in other components
+  export { performanceMonitor };
+</script>
+
+<!-- Performance hints for the browser -->
+<link rel="dns-prefetch" href="//fonts.googleapis.com" />
+<link rel="dns-prefetch" href="//fonts.gstatic.com" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<!-- Resource hints -->
+<meta http-equiv="x-dns-prefetch-control" content="on" />
+
+<style>
+  /* Performance-focused CSS */
+  * {
+    /* Use hardware acceleration for animations */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  /* Optimize font rendering */
+  body {
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Optimize image rendering */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+  
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
